@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -17,24 +15,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun CustomOutlinedTextField(
-    modifier : Modifier,
-    value : String,
-    onValueChange : (String) -> Unit,
-    trailingIcon : ImageVector,
-    placeHolder : String,
-    onTrailingIconClick : () -> Unit
-){
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChange: (String) -> Unit,
+    trailingIcon: ImageVector,
+    placeHolder: String,
+    onTrailingIconClick: () -> Unit
+) {
     val colors = MaterialTheme.colorScheme
+
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         singleLine = true,
         shape = CircleShape,
         trailingIcon = {
@@ -42,10 +39,10 @@ fun CustomOutlinedTextField(
                 imageVector = trailingIcon,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(40.dp) // un poco más discreto que 50.dp
                     .clip(CircleShape)
                     .background(colors.primary)
-                    .padding(5.dp)
+                    .padding(6.dp)
                     .clickable { onTrailingIconClick() },
                 tint = colors.surface
             )
@@ -64,10 +61,7 @@ fun CustomOutlinedTextField(
             unfocusedPlaceholderColor = colors.onSurfaceVariant
         ),
         placeholder = {
-            Text(
-                text = placeHolder
-            )
+            Text(text = placeHolder)
         }
-
     )
 }

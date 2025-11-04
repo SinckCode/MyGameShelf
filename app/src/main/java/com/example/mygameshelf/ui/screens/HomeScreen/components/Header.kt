@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -23,50 +22,63 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.mygameshelf.ui.RecipeTheme
-
+import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 
 @Composable
-fun Header(){
+fun Header(
+    userName: String = "Onesto",
+    onLogout: () -> Unit = {}
+) {
     val colors = MaterialTheme.colorScheme
+    val initial = userName.firstOrNull()?.uppercase() ?: "?"
+
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Texto izquierdo
         Column(
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Hola",
-                fontWeight = FontWeight.Light
+                text = "GameVault",
+                style = MaterialTheme
+                    .typography
+                    .titleLarge
+                    .copy(fontWeight = FontWeight.ExtraBold)
             )
             Text(
-                text = "Onesto",
-                fontWeight = FontWeight.Bold
+                text = "Hola, $userName 👋",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colors.onBackground.copy(alpha = 0.8f)
             )
-        } // Fin del Column
+        }
+
+        // Avatar con inicial
         Box(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(colors.primary.copy(alpha = 0.25f)),
+                .background(colors.primary.copy(alpha = 0.18f)),
             contentAlignment = Alignment.Center
-        ){
+        ) {
             Text(
-                text = "O"
+                text = initial,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = colors.primary
             )
-        }//Fin del Box
+        }
 
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
+        // Botón logout
         IconButton(
-            onClick = {  }
-        ){
+            onClick = onLogout
+        ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
-                contentDescription = null,
+                contentDescription = "Cerrar sesión",
                 tint = colors.primary
             )
         }
@@ -75,8 +87,8 @@ fun Header(){
 
 @Preview(showBackground = true)
 @Composable
-fun HomeScreenPreview(){
-    RecipeTheme {
+fun HeaderPreview() {
+    MyGameShelfTheme {
         Header()
     }
 }

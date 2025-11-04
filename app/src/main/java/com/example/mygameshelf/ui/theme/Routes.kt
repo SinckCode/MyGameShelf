@@ -16,3 +16,10 @@ object MainScreenRoute
 
 @Serializable
 object MainScreenGraph
+
+
+@Serializable
+object SearchScreenRoute
+
+@Serializable
+object FavoritesScreenRoute
