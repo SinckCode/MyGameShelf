@@ -1,11 +1,10 @@
-package com.pjasoft.recipeapp.data.services
+package com.example.mygameshelf.data.services
 
-import com.pjasoft.recipeapp.domain.dtos.AuthResponse
-import com.pjasoft.recipeapp.domain.dtos.Login
-import com.pjasoft.recipeapp.domain.dtos.Register
+import com.example.mygameshelf.domain.dtos.AuthResponse
+import com.example.mygameshelf.domain.dtos.Login
+import com.example.mygameshelf.domain.dtos.Register
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.POST
-
 
 interface AuthService {
 

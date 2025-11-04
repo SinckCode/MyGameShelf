@@ -1,7 +1,7 @@
-package com.pjasoft.recipeapp.data
+package com.example.mygameshelf.data.services
 
-import com.pjasoft.recipeapp.data.services.AuthService
-import com.pjasoft.recipeapp.data.services.createAuthService
+import com.example.mygameshelf.data.services.AuthService
+import com.example.mygameshelf.data.services.createAuthService
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -12,33 +12,47 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
+// HTTP Client + Ktorfit para MyGameShelf
+object KtorfitClient {
 
-//HTTP Client
-object KtorfitClient{
-    val httpClient = HttpClient{
+    // 👇 Base URL de tu API
+    private const val BASE_URL = "https://mygameshelf.angelonesto.com/"
+
+    val httpClient = HttpClient {
         expectSuccess = false
+
         install(ContentNegotiation) {
             json(
                 Json {
                     isLenient = true
                     ignoreUnknownKeys = true
+                    encodeDefaults = true
                 }
             )
         }
+
         defaultRequest {
             contentType(ContentType.Application.Json)
             accept(ContentType.Application.Json)
         }
     }
 
-    val baseUrl = "https://recipes.pjasoft.com/api/"
-    private val ktorfit = Ktorfit
+    private val ktorfit: Ktorfit = Ktorfit
         .Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(BASE_URL)
         .httpClient(httpClient)
         .build()
 
-    fun createAuthService() : AuthService{
+
+    fun createAuthService(): AuthService{
         return ktorfit.createAuthService()
+    }
+
+    fun createGameService(): GameService{
+        return ktorfit.createGameService()
+    }
+
+    fun createCompanyService(): CompanyService{
+        return ktorfit.createCompanyService()
     }
 }

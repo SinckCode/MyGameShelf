@@ -2,10 +2,9 @@ package com.example.mygameshelf.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pjasoft.recipeapp.data.KtorfitClient
-import com.pjasoft.recipeapp.domain.dtos.Login
-import com.pjasoft.recipeapp.domain.dtos.Register
-import de.jensklingenberg.ktorfit.Ktorfit
+import com.example.mygameshelf.data.services.KtorfitClient
+import com.example.mygameshelf.domain.dtos.Login
+import com.example.mygameshelf.domain.dtos.Register
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
@@ -15,31 +14,34 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String,
         onResult: (Boolean, String) -> Unit
-    ){
+    ) {
         viewModelScope.launch {
             try {
-
                 val service = KtorfitClient.createAuthService()
-                val register = Register(
+
+                val registerDto = Register(
                     name = name,
                     email = email,
                     password = password
                 )
 
-                val result = service.register(register)
-                if (result.isLogged){
-                    // QUE EL USUARIO SE REGISTRO Y SE LOGUEO
-                    println("Loggeo")
+                val result = service.register(registerDto)
+
+                if (result.islogged) {
+                    // El usuario se registró y quedó logueado
+                    println("Registro + login OK")
+                    println("AuthResponse: $result")
                     onResult(true, result.message)
-                    print(result.toString())
-                }else{
-                    //OCURRIO UN ERROR
-                    println("No loggeo")
+                    // Si quieres guardar el userId:
+                    // result.userId
+                } else {
+                    // Ocurrió un error lógico en el backend
+                    println("No se pudo registrar / loguear")
+                    println("AuthResponse: $result")
                     onResult(false, result.message)
-                    print(result.toString())
                 }
-            }catch (e: Exception) {
-                print(e.toString())
+            } catch (e: Exception) {
+                e.printStackTrace()
                 onResult(false, "Error al registrar")
             }
         }
@@ -49,34 +51,34 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String,
         onResult: (Boolean, String) -> Unit
-    ){
+    ) {
         viewModelScope.launch {
             try {
-
                 val service = KtorfitClient.createAuthService()
-                val login = Login(
+
+                val loginDto = Login(
                     email = email,
                     password = password
                 )
 
-                val result = service.login(login)
-                if (result.isLogged){
-                    // QUE EL USUARIO SE REGISTRO Y SE LOGUEO
-                    println("Loggeo")
+                val result = service.login(loginDto)
+
+                if (result.islogged) {
+                    // Login correcto
+                    println("Login OK")
+                    println("AuthResponse: $result")
                     onResult(true, result.message)
-                    print(result.toString())
-                }else{
-                    //OCURRIO UN ERROR
-                    println("No loggeo")
+                    // Aquí también podrías usar result.userId
+                } else {
+                    // Credenciales incorrectas u otro error controlado
+                    println("Login fallido")
+                    println("AuthResponse: $result")
                     onResult(false, result.message)
-                    print(result.toString())
                 }
-            }catch (e: Exception){
-                print(e.toString())
-                onResult(false, "Error al registrar")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResult(false, "Error al iniciar sesión")
             }
         }
     }
-
-
 }
