@@ -9,5 +9,6 @@ data class AuthResponse(
     val message : String,
     @SerialName("isLogged") val islogged : Boolean,
     //val isLogged : Boolean,
-    val userId: String? = null
+    val userId: String? = null,
+    val name: String? = null
 )

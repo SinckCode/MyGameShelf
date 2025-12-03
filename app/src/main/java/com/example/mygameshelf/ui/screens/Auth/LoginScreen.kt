@@ -1,12 +1,15 @@
 package com.example.mygameshelf.ui.screens.Auth
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.material3.ButtonDefaults.buttonColors
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,12 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -34,20 +33,21 @@ import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 
-
 @Composable
 fun LoginScreen(
     navController: NavController,
     contentPadding: PaddingValues
 ) {
     val color = MaterialTheme.colorScheme
-    val viewModel : AuthViewModel = viewModel()
+    val viewModel: AuthViewModel = viewModel()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLogged by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(isLogged) {
-        if (isLogged) {
+    // Si ya hay sesión guardada, salta directo al Home
+    LaunchedEffect(Unit) {
+        if (viewModel.isLogged()) {
             navController.navigate(MainScreenRoute) {
                 popUpTo(LoginScreenRoute) { inclusive = true }
             }
@@ -70,7 +70,10 @@ fun LoginScreen(
 
                 AuthTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = {
+                        email = it
+                        errorMessage = null
+                    },
                     placeholder = "Correo electrónico",
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -79,7 +82,10 @@ fun LoginScreen(
 
                 AuthTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        errorMessage = null
+                    },
                     placeholder = "Contraseña",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth()
@@ -89,17 +95,43 @@ fun LoginScreen(
 
                 PrimaryButton(
                     text = "Iniciar sesión",
-                    onClick = { viewModel.login(
-                        email = email,
-                       password = password
-                   ){result, message ->
-                       if (result) isLogged = true
+                    onClick = {
+                        // Validaciones locales
+                        if (email.isBlank() || password.isBlank()) {
+                            errorMessage = "Completa ambos campos."
+                            return@PrimaryButton
+                        }
 
-                    } },
+                        viewModel.login(
+                            email = email.trim(),
+                            password = password
+                        ) { result, message ->
+                            if (result) {
+                                // Login OK, sesión ya guardada en Preferences
+                                navController.navigate(MainScreenRoute) {
+                                    popUpTo(LoginScreenRoute) { inclusive = true }
+                                }
+                            } else {
+                                errorMessage = message
+                                println(message)
+                            }
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
                 )
+
+                // Mensaje de error
+                errorMessage?.let { msg ->
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = msg,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -116,12 +148,13 @@ fun LoginScreen(
     }
 }
 
-
-@Preview
 @Composable
+@Preview
 fun LoginScrenPreview() {
-    RecipeTheme { LoginScreen(
-        navController = rememberNavController(),
-        contentPadding = PaddingValues(0.dp)
-    ) }
+    RecipeTheme {
+        LoginScreen(
+            navController = rememberNavController(),
+            contentPadding = PaddingValues(0.dp)
+        )
+    }
 }

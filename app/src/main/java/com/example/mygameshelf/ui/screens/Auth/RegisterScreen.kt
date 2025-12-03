@@ -28,18 +28,19 @@ import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 
-
 @Composable
 fun RegisterScreen(
     navController: NavController,
     contentPadding: PaddingValues
 ) {
-    val viewModel : AuthViewModel = viewModel()
+    val viewModel: AuthViewModel = viewModel()
     val color = MaterialTheme.colorScheme
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Box(Modifier.fillMaxSize()) {
         AuthBackGround()
@@ -57,18 +58,22 @@ fun RegisterScreen(
 
                 AuthTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = {
+                        name = it
+                        errorMessage = null
+                    },
                     placeholder = "Nombre",
                     modifier = Modifier.fillMaxWidth()
-                    // isPassword = false  // por defecto ya es false
                 )
 
                 Spacer(Modifier.height(10.dp))
 
-
                 AuthTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = {
+                        email = it
+                        errorMessage = null
+                    },
                     placeholder = "Correo electrónico",
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -77,7 +82,10 @@ fun RegisterScreen(
 
                 AuthTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        errorMessage = null
+                    },
                     placeholder = "Contraseña",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth()
@@ -87,7 +95,10 @@ fun RegisterScreen(
 
                 AuthTextField(
                     value = confirmPassword,
-                    onValueChange = { confirmPassword = it },
+                    onValueChange = {
+                        confirmPassword = it
+                        errorMessage = null
+                    },
                     placeholder = "Confirmar contraseña",
                     isPassword = true,
                     modifier = Modifier.fillMaxWidth()
@@ -98,39 +109,54 @@ fun RegisterScreen(
                 PrimaryButton(
                     text = "Registrarme",
                     onClick = {
-                        if (name.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank()){
-                            //Algun fill esta en blanco
+                        // Validaciones locales
+                        if (name.isBlank() || email.isBlank() ||
+                            password.isBlank() || confirmPassword.isBlank()
+                        ) {
+                            errorMessage = "Completa todos los campos."
                             return@PrimaryButton
                         }
 
-                        if (password != confirmPassword){
-                            //Las contraswñas no coinciden
-                            //REGEX
+                        if (password != confirmPassword) {
+                            errorMessage = "Las contraseñas no coinciden."
                             return@PrimaryButton
                         }
 
+                        // Llamada al ViewModel
                         viewModel.register(
-                            name = name,
-                            email = email,
+                            name = name.trim(),
+                            email = email.trim(),
                             password = password
-                        ){ result, message ->
-                            if (result){
-                                navController.navigate(MainScreenRoute){
+                        ) { result, message ->
+                            if (result) {
+                                // Ya guardó sesión en Preferences -> ir al Home
+                                navController.navigate(MainScreenRoute) {
                                     popUpTo(RegisterScreenRoute) {
                                         inclusive = true
                                     }
                                 }
-                            }else{
-                                //Mostrar un error
+                            } else {
+                                // Mostrar error del backend
+                                errorMessage = message
                                 println(message)
                             }
-
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
                 )
+
+                // Mensaje de error
+                errorMessage?.let { msg ->
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = msg,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
 
                 Spacer(Modifier.height(8.dp))
 

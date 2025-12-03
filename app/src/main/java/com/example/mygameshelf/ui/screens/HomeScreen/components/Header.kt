@@ -26,35 +26,39 @@ import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 
 @Composable
 fun Header(
-    userName: String = "Onesto",
+    userName: String = "",
     onLogout: () -> Unit = {}
 ) {
     val colors = MaterialTheme.colorScheme
+
+    val label = if (userName.isNotEmpty()) {
+        "Hola, $userName 👋"
+    } else {
+        "Bienvenido a MyGameShelf"
+    }
+
     val initial = userName.firstOrNull()?.uppercase() ?: "?"
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Texto izquierdo
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "GameVault",
-                style = MaterialTheme
-                    .typography
-                    .titleLarge
-                    .copy(fontWeight = FontWeight.ExtraBold)
+                text = "MyGameShelf",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold
+                )
             )
             Text(
-                text = "Hola, $userName 👋",
+                text = label,
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.onBackground.copy(alpha = 0.8f)
             )
         }
 
-        // Avatar con inicial
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -72,10 +76,7 @@ fun Header(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Botón logout
-        IconButton(
-            onClick = onLogout
-        ) {
+        IconButton(onClick = onLogout) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Cerrar sesión",
@@ -85,10 +86,11 @@ fun Header(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun HeaderPreview() {
     MyGameShelfTheme {
-        Header()
+        Header(userName = "Ángel")
     }
 }
