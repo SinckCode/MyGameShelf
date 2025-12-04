@@ -1,6 +1,7 @@
 package com.example.mygameshelf.ui.screens.HomeScreen.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,7 +28,8 @@ import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 @Composable
 fun Header(
     userName: String = "",
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    onProfileClick: () -> Unit = {}      // 👈 nuevo callback
 ) {
     val colors = MaterialTheme.colorScheme
 
@@ -59,11 +61,13 @@ fun Header(
             )
         }
 
+        // avatar con la inicial -> navegamos a UserView al tocarlo
         Box(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(colors.primary.copy(alpha = 0.18f)),
+                .background(colors.primary.copy(alpha = 0.18f))
+                .clickable { onProfileClick() },       // 👈 aquí
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -85,7 +89,6 @@ fun Header(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

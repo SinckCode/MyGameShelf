@@ -11,37 +11,42 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.example.mygameshelf.ui.screens.Auth.LoginScreen
 import com.example.mygameshelf.ui.screens.Auth.RegisterScreen
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailCompany
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailGame
+import com.example.mygameshelf.ui.screens.HomeScreen.ListView.CreateListView.CreateListView
+import com.example.mygameshelf.ui.screens.HomeScreen.ListView.ListView
+import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.AddList.AddList
+import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.ListViewDetail
+import com.example.mygameshelf.ui.screens.HomeScreen.Search.SearchScreen
+import com.example.mygameshelf.ui.screens.HomeScreen.UserView.UserView
 import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
 import com.example.mygameshelf.ui.screens.MainScreen
-import com.example.mygameshelf.ui.theme.FavoritesScreenRoute
-import com.example.mygameshelf.ui.theme.LoginScreenRoute
-import com.example.mygameshelf.ui.theme.MainScreenGraph
-import com.example.mygameshelf.ui.theme.MainScreenRoute
-import com.example.mygameshelf.ui.theme.MyGameShelfTheme
-import com.example.mygameshelf.ui.theme.RegisterScreenRoute
-import com.example.mygameshelf.ui.theme.SearchScreenRoute
+import com.example.mygameshelf.ui.theme.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             MyGameShelfTheme {
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = backStackEntry?.destination
 
-                // Bottom bar solo en las pantallas principales
                 val showBottomBar =
                     currentDestination.isRoute<MainScreenRoute>() ||
-                            currentDestination.isRoute<FavoritesScreenRoute>() ||
+                            currentDestination.isRoute<ListViewRoute>()   ||
                             currentDestination.isRoute<SearchScreenRoute>()
 
                 Scaffold(
@@ -56,6 +61,7 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = LoginScreenRoute
                     ) {
+                        // ---------- AUTH ----------
                         composable<LoginScreenRoute> {
                             LoginScreen(
                                 navController = navController,
@@ -70,10 +76,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        // ---------- NAVEGACIÓN PRINCIPAL ----------
                         navigation<MainScreenGraph>(
                             startDestination = MainScreenRoute
                         ) {
-                            // HOME (usa tu MainScreen actual, que llama a HomeScreen)
+                            // HOME
                             composable<MainScreenRoute> {
                                 MainScreen(
                                     navController = navController,
@@ -81,14 +88,60 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            // FAVORITES / LISTAS (por ahora placeholder)
-                            composable<FavoritesScreenRoute> {
-                                FavoritesPlaceholder()
+                            // LISTAS (tab central)
+                            composable<ListViewRoute> {
+                                ListView(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
                             }
 
-                            // SEARCH (por ahora placeholder)
+                            // SEARCH (tab derecha – lupa)
                             composable<SearchScreenRoute> {
-                                SearchPlaceholder()
+                                SearchScreen(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
+                            }
+
+                            // USER VIEW (perfil, no tiene tab propia)
+                            composable<UserViewRoute> {
+                                UserView(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
+                            }
+
+                            // ---------- LISTAS ----------
+                            composable<CreateListRoute> {
+                                CreateListView(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
+                            }
+
+                            composable<ListDetailRoute> {
+                                ListViewDetail(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
+                            }
+
+                            composable<AddListRoute> {
+                                AddList(
+                                    navController = navController,
+                                    contentPadding = innerPadding
+                                )
+                            }
+                            // ---------- DETALLE DE GAME / COMPANY ----------
+                            composable<DetailGameRoute> { backStackEntry ->
+                                val args: DetailGameRoute = backStackEntry.toRoute()
+                                DetailGame(gameId = args.gameId)
+                            }
+
+                            composable<DetailCompanyRoute> { backStackEntry ->
+                                val args: DetailCompanyRoute = backStackEntry.toRoute()
+                                DetailCompany(companyId = args.companyId)
                             }
                         }
                     }
@@ -98,26 +151,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// --- Helpers y previews ---
-
-// Helper propio para rutas tipadas (@Serializable object ...)
+// Helper
 private inline fun <reified T> NavDestination?.isRoute(): Boolean =
     this?.route == T::class.qualifiedName
 
-// Placeholders rápidos hasta que conectes tus pantallas reales
-@Composable
-private fun FavoritesPlaceholder() {
-    androidx.compose.material3.Text("Favorites screen")
-}
 
 @Composable
-private fun SearchPlaceholder() {
-    androidx.compose.material3.Text("Search screen")
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) =
-    androidx.compose.material3.Text(text = "Hello $name!", modifier = modifier)
+fun Greeting(name: String) =
+    androidx.compose.material3.Text(text = "Hello $name!")
 
 @Preview(showBackground = true)
 @Composable

@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.mygameshelf.ui.theme.FavoritesScreenRoute
+import com.example.mygameshelf.ui.theme.ListViewRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.SearchScreenRoute
 
@@ -37,7 +37,7 @@ fun MyBottomBar(
             .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // Pastilla principal (Home + Favorites)
+        // Pastilla principal (Home + Listas)
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,6 +52,7 @@ fun MyBottomBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // HOME
                 BottomBarItem(
                     icon = Icons.Outlined.Home,
                     selected = currentDestination.isRoute<MainScreenRoute>(),
@@ -63,11 +64,13 @@ fun MyBottomBar(
                         }
                     }
                 )
+
+                // LISTAS (antes Favorites)
                 BottomBarItem(
                     icon = Icons.Outlined.LibraryBooks,
-                    selected = currentDestination.isRoute<FavoritesScreenRoute>(),
+                    selected = currentDestination.isRoute<ListViewRoute>(),
                     onClick = {
-                        navController.navigate(FavoritesScreenRoute) {
+                        navController.navigate(ListViewRoute) {
                             launchSingleTop = true
                             popUpTo<MainScreenRoute> { saveState = true }
                             restoreState = true
@@ -77,7 +80,7 @@ fun MyBottomBar(
             }
         }
 
-        // Botón circular de búsqueda (a la derecha)
+        // Botón circular de búsqueda / perfil (a la derecha)
         Surface(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -126,7 +129,6 @@ private fun BottomBarItem(
 
 /**
  * Helper propio para rutas tipadas (@Serializable object ...)
- * Compara el `route` con el qualifiedName de la clase.
  */
 private inline fun <reified T> NavDestination?.isRoute(): Boolean =
     this?.route == T::class.qualifiedName

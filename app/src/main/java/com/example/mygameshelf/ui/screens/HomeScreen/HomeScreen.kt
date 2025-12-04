@@ -2,25 +2,32 @@ package com.example.mygameshelf.ui.screens.HomeScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,13 +54,19 @@ import com.example.mygameshelf.domain.dtos.company.CompanyDto
 import com.example.mygameshelf.domain.dtos.game.GameDto
 import com.example.mygameshelf.ui.components.CustomOutlinedTextField
 import com.example.mygameshelf.ui.components.LoadingOverlay
+import com.example.mygameshelf.ui.screens.Auth.components.PrimaryButton
 import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
+import com.example.mygameshelf.ui.theme.DetailCompanyRoute
+import com.example.mygameshelf.ui.theme.DetailGameRoute
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.MyGameShelfTheme
+import com.example.mygameshelf.ui.theme.SearchScreenRoute
+import com.example.mygameshelf.ui.theme.UserViewRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 import com.example.mygameshelf.ui.viewmodels.CompaniesViewModel
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +79,11 @@ fun HomeScreen(
     authViewModel: AuthViewModel = viewModel()
 ) {
     val colors = MaterialTheme.colorScheme
+
+    // buscador principal
     var search by remember { mutableStateOf("") }
+    // texto del filtro dentro del sheet
+    var filterName by remember { mutableStateOf("") }
 
     val companiesState by companiesViewModel.uiState.collectAsState()
     val gamesState by gamesViewModel.uiState.collectAsState()
@@ -98,7 +115,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
 
-            // HEADER (usuario + logout)
+            // HEADER (usuario + logout + perfil)
             item {
                 Header(
                     userName = userName,
@@ -107,89 +124,36 @@ fun HomeScreen(
                         navController.navigate(LoginScreenRoute) {
                             popUpTo(MainScreenRoute) { inclusive = true }
                         }
+                    },
+                    onProfileClick = {
+                        // por ahora UserView está mapeado a SearchScreenRoute
+                        navController.navigate(UserViewRoute) {
+                            launchSingleTop = true
+                            popUpTo<MainScreenRoute> { saveState = true }
+                            restoreState = true
+                        }
                     }
                 )
             }
 
-            // CÍRCULO CENTRAL (botón +)
+            // HERO CON IMÁGENES DE JUEGOS (fondo con blackout)
             item {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(90.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        // línea que cruza el fondo (como el sketch)
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(1.dp)
-                                .background(
-                                    colors.outlineVariant.copy(alpha = 0.4f)
-                                )
-                        )
-
-                        Surface(
-                            modifier = Modifier
-                                .size(110.dp)
-                                .clickable {
-                                    showSheet = true
-                                    scope.launch { sheetState.expand() }
-                                },
-                            shape = CircleShape,
-                            tonalElevation = 8.dp,
-                            color = colors.primaryContainer
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Agregar juego",
-                                    tint = colors.onPrimaryContainer
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = "Agregar juego",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onBackground.copy(alpha = 0.75f)
-                    )
-                }
+                GamesHeroHeader(games = gamesState.games)
             }
 
-            // TÍTULO + BUSCADOR (debajo del círculo)
+            // BUSCADOR
             item {
                 Column {
-                    Text(
-                        text = "MyGameShelf",
-                        style = MaterialTheme
-                            .typography
-                            .headlineMedium
-                            .copy(fontWeight = FontWeight.ExtraBold)
-                    )
-                    Text(
-                        text = "Organiza y descubre tus juegos",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = colors.onBackground.copy(alpha = 0.7f)
-                    )
                     Spacer(modifier = Modifier.height(12.dp))
                     CustomOutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = search,
                         onValueChange = { search = it },
                         trailingIcon = Icons.Default.AutoAwesome,
-                        placeHolder = "Busca juegos o compañías…",
+                        placeHolder = "Busca juegos por nombre…",
                         onTrailingIconClick = {
+                            // abrimos el sheet con el texto actual
+                            filterName = search
                             showSheet = true
                             scope.launch { sheetState.partialExpand() }
                         }
@@ -197,7 +161,7 @@ fun HomeScreen(
                 }
             }
 
-            // SECCIÓN GAMES (como en el dibujo)
+            // SECCIÓN GAMES
             item {
                 SectionTitle(text = "GAMES")
             }
@@ -219,17 +183,23 @@ fun HomeScreen(
                     }
 
                     else -> {
-                        GamesRow(games = gamesState.games)
+                        GamesRow(
+                            games = gamesState.games,
+                            onGameClick = { game ->
+                                // navegación tipada
+                                navController.navigate(DetailGameRoute(game.id))
+                            }
+                        )
                     }
                 }
             }
 
-            // TARJETA ANCHA (banner tipo recomendación / estantería)
+            // TARJETA ANCHA (banner tipo estantería)
             item {
                 FeaturedShelfCard()
             }
 
-            // EMPRESAS (pueden quedar debajo del banner)
+            // EMPRESAS
             item {
                 SectionTitle(text = "Empresas de videojuegos")
             }
@@ -251,13 +221,18 @@ fun HomeScreen(
                     }
 
                     else -> {
-                        CompaniesRow(companies = companiesState.companies)
+                        CompaniesRow(
+                            companies = companiesState.companies,
+                            onCompanyClick = { company ->
+                                navController.navigate(DetailCompanyRoute(company.id))
+                            }
+                        )
                     }
                 }
             }
         }
 
-        // MODAL (lo usamos tanto desde el + como desde el buscador)
+        // MODAL (filtro por nombre)
         if (showSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
@@ -271,16 +246,57 @@ fun HomeScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Acciones rápidas",
+                        text = "Filtros de búsqueda",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        text = "Aquí luego podemos agregar opciones para añadir juegos, filtrar por género, plataforma, etc.",
+                        text = "Filtra los juegos por nombre.",
                         style = MaterialTheme.typography.bodySmall
                     )
-                    Spacer(Modifier.height(24.dp))
+
+                    Spacer(Modifier.height(16.dp))
+
+                    CustomOutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = filterName,
+                        onValueChange = { filterName = it },
+                        trailingIcon = Icons.Default.AutoAwesome,
+                        placeHolder = "Nombre del juego…",
+                        onTrailingIconClick = { /* sin acción especial */ }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    PrimaryButton(
+                        text = "Aplicar filtros",
+                        onClick = {
+                            gamesViewModel.filterByName(filterName)
+                            search = filterName
+                            showSheet = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    PrimaryButton(
+                        text = "Limpiar filtros",
+                        onClick = {
+                            gamesViewModel.clearFilters()
+                            filterName = ""
+                            search = ""
+                            showSheet = false
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
+                    )
+
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }
@@ -305,6 +321,92 @@ private fun SectionTitle(text: String) {
             .copy(fontWeight = FontWeight.SemiBold),
         modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
     )
+}
+
+/**
+ * Hero superior con imágenes de juegos y blackout
+ */
+@Composable
+private fun GamesHeroHeader(games: List<GameDto>) {
+    val colors = MaterialTheme.colorScheme
+    val context = LocalContext.current
+
+    val imageUrls = remember(games) {
+        games.mapNotNull { it.imagenURL.takeIf { url -> url.isNotBlank() } }
+    }
+
+    var currentIndex by remember { mutableStateOf(0) }
+
+    // Cambio automático de imagen cada 5s
+    LaunchedEffect(imageUrls) {
+        if (imageUrls.size <= 1) return@LaunchedEffect
+        while (true) {
+            delay(5000L)
+            currentIndex = (currentIndex + 1) % imageUrls.size
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = MaterialTheme.shapes.large
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            if (imageUrls.isNotEmpty()) {
+                AsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(imageUrls[currentIndex])
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = "Juego destacado",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                // fallback si aún no hay juegos
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(
+                                    colors.primary.copy(alpha = 0.9f),
+                                    colors.secondary.copy(alpha = 0.9f)
+                                )
+                            )
+                        )
+                )
+            }
+
+            // blackout
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.45f))
+            )
+
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Descubre tu siguiente juego",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Explora tu colección y sigue jugando.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.9f)
+                )
+            }
+        }
+    }
 }
 
 /**
@@ -358,7 +460,8 @@ private fun FeaturedShelfCard() {
 // Carrusel horizontal de compañías
 @Composable
 private fun CompaniesRow(
-    companies: List<CompanyDto>
+    companies: List<CompanyDto>,
+    onCompanyClick: (CompanyDto) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
@@ -371,7 +474,8 @@ private fun CompaniesRow(
             Card(
                 modifier = Modifier
                     .width(220.dp)
-                    .height(140.dp),
+                    .height(140.dp)
+                    .clickable { onCompanyClick(company) },
                 colors = CardDefaults.cardColors(
                     containerColor = colors.surfaceVariant
                 )
@@ -419,7 +523,8 @@ private fun CompaniesRow(
 // Carrusel horizontal de juegos
 @Composable
 private fun GamesRow(
-    games: List<GameDto>
+    games: List<GameDto>,
+    onGameClick: (GameDto) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
@@ -432,7 +537,8 @@ private fun GamesRow(
             Card(
                 modifier = Modifier
                     .width(120.dp)
-                    .height(110.dp),
+                    .height(110.dp)
+                    .clickable { onGameClick(game) },
                 colors = CardDefaults.cardColors(
                     containerColor = colors.surfaceVariant
                 )
@@ -483,7 +589,9 @@ private fun GamesRow(
 fun HomeScreenPreview() {
     MyGameShelfTheme {
         val navController = rememberNavController()
-        HomeScreen(navController = navController,
-            contentPadding = PaddingValues())
+        HomeScreen(
+            navController = navController,
+            contentPadding = PaddingValues()
+        )
     }
 }

@@ -55,4 +55,8 @@ object KtorfitClient {
     fun createCompanyService(): CompanyService{
         return ktorfit.createCompanyService()
     }
+
+    fun createPlaylistService(): PlaylistService {
+        return ktorfit.createPlaylistService()
+    }
 }

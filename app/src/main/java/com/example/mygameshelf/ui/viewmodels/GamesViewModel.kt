@@ -19,6 +19,9 @@ class GamesViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(GamesUiState())
     val uiState: StateFlow<GamesUiState> = _uiState
 
+    // Lista original sin filtros
+    private var originalGames: List<GameDto> = emptyList()
+
     init {
         loadGames()
     }
@@ -34,6 +37,8 @@ class GamesViewModel : ViewModel() {
                 val service = KtorfitClient.createGameService()
                 val result = service.getGames()
 
+                originalGames = result
+
                 _uiState.value = GamesUiState(
                     isLoading = false,
                     games = result,
@@ -48,5 +53,27 @@ class GamesViewModel : ViewModel() {
                 )
             }
         }
+    }
+
+    // --- FILTROS SENCILLOS ---
+
+    fun filterByName(query: String) {
+        val trimmed = query.trim()
+
+        // Si está vacío, regresamos a la lista original
+        if (trimmed.isBlank()) {
+            _uiState.value = _uiState.value.copy(games = originalGames)
+            return
+        }
+
+        val filtered = originalGames.filter { game ->
+            game.nombre.contains(trimmed, ignoreCase = true)
+        }
+
+        _uiState.value = _uiState.value.copy(games = filtered)
+    }
+
+    fun clearFilters() {
+        _uiState.value = _uiState.value.copy(games = originalGames)
     }
 }
