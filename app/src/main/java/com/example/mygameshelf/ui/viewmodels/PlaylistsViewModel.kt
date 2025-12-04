@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.mygameshelf.data.services.KtorfitClient
 import com.example.mygameshelf.data.services.PlaylistService
 import com.example.mygameshelf.data.services.Preferences
-import com.example.mygameshelf.domain.dtos.playlist.CreatePlaylistRequest
+import com.example.mygameshelf.domain.builders.PlaylistRequestBuilder
 import com.example.mygameshelf.domain.dtos.playlist.PlaylistDetailDto
 import com.example.mygameshelf.domain.dtos.playlist.PlaylistDto
-import com.example.mygameshelf.domain.dtos.playlist.UpdatePlaylistGamesRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,7 +50,6 @@ class PlaylistsViewModel(
 
     fun loadPlaylists() {
         viewModelScope.launch {
-            // empezamos cargando
             _playlistsState.value = _playlistsState.value.copy(
                 isLoading = true,
                 error = null
@@ -73,24 +71,23 @@ class PlaylistsViewModel(
         }
     }
 
-    // ------- CREAR PLAYLIST -------
+    // ------- CREAR PLAYLIST (usando Builder) -------
 
     fun createPlaylist(name: String) {
         viewModelScope.launch {
-            // marcamos loading y limpiamos error
             _playlistsState.value = _playlistsState.value.copy(
                 isLoading = true,
                 error = null
             )
 
             try {
+                val request = PlaylistRequestBuilder()
+                    .name(name)
+                    .userId(userId)
+                    .buildCreateRequest()
+
                 // 1) crear playlist
-                playlistService.createPlaylist(
-                    CreatePlaylistRequest(
-                        name = name,
-                        userId = userId
-                    )
-                )
+                playlistService.createPlaylist(request)
 
                 // 2) recargar listas desde el servidor
                 val data = playlistService.getMyPlaylists(userId)
@@ -135,7 +132,7 @@ class PlaylistsViewModel(
         }
     }
 
-    // ------- ASIGNAR JUEGOS A PLAYLIST -------
+    // ------- ASIGNAR JUEGOS A PLAYLIST (usando Builder) -------
 
     fun setPlaylistGames(
         playlistId: String,
@@ -144,13 +141,16 @@ class PlaylistsViewModel(
     ) {
         viewModelScope.launch {
             try {
+                val request = PlaylistRequestBuilder()
+                    .userId(userId)
+                    .addGames(gameIds)
+                    .buildUpdateGamesRequest()
+
                 playlistService.setPlaylistGames(
-                    playlistId,
-                    UpdatePlaylistGamesRequest(
-                        userId = userId,
-                        gameIds = gameIds
-                    )
+                    playlistId = playlistId,
+                    body = request
                 )
+
                 loadPlaylistDetail(playlistId)
                 onSuccess()
             } catch (_: Exception) {
