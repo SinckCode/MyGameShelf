@@ -11,6 +11,7 @@ fun MainScreen(
     contentPadding: PaddingValues
 ) {
     HomeScreen(
-        navController = navController
+        navController = navController,
+        contentPadding = contentPadding
     )
 }

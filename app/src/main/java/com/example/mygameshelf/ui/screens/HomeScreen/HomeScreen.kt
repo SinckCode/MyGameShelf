@@ -46,6 +46,7 @@ import coil3.request.crossfade
 import com.example.mygameshelf.domain.dtos.company.CompanyDto
 import com.example.mygameshelf.domain.dtos.game.GameDto
 import com.example.mygameshelf.ui.components.CustomOutlinedTextField
+import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
@@ -59,6 +60,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
+    contentPadding: PaddingValues,
     companiesViewModel: CompaniesViewModel = viewModel(),
     gamesViewModel: GamesViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
@@ -75,14 +77,22 @@ fun HomeScreen(
 
     val userName = remember { authViewModel.getUserName() }
 
+    // Loading global (pantalla completa)
+    val isGlobalLoading =
+        (companiesState.isLoading || gamesState.isLoading) &&
+                companiesState.error == null &&
+                gamesState.error == null
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colors.background)
     ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(contentPadding)
                 .safeContentPadding()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -273,6 +283,14 @@ fun HomeScreen(
                     Spacer(Modifier.height(24.dp))
                 }
             }
+        }
+
+        // Overlay de carga global
+        if (isGlobalLoading) {
+            LoadingOverlay(
+                colors = colors,
+                message = "Cargando tu estantería..."
+            )
         }
     }
 }
@@ -465,6 +483,7 @@ private fun GamesRow(
 fun HomeScreenPreview() {
     MyGameShelfTheme {
         val navController = rememberNavController()
-        HomeScreen(navController = navController)
+        HomeScreen(navController = navController,
+            contentPadding = PaddingValues())
     }
 }

@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.mygameshelf.ui.RecipeTheme
+import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.screens.Auth.components.AuthBackGround
 import com.example.mygameshelf.ui.screens.Auth.components.AuthCard
 import com.example.mygameshelf.ui.screens.Auth.components.AuthTextField
 import com.example.mygameshelf.ui.screens.Auth.components.PrimaryButton
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
+import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 
@@ -38,23 +39,30 @@ fun LoginScreen(
     navController: NavController,
     contentPadding: PaddingValues
 ) {
-    val color = MaterialTheme.colorScheme
+    val colors = MaterialTheme.colorScheme
     val viewModel: AuthViewModel = viewModel()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
     // Si ya hay sesión guardada, salta directo al Home
     LaunchedEffect(Unit) {
+        isLoading = true
         if (viewModel.isLogged()) {
             navController.navigate(MainScreenRoute) {
                 popUpTo(LoginScreenRoute) { inclusive = true }
             }
         }
+        isLoading = false
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+    ) {
         AuthBackGround()
 
         Box(
@@ -102,10 +110,12 @@ fun LoginScreen(
                             return@PrimaryButton
                         }
 
+                        isLoading = true
                         viewModel.login(
                             email = email.trim(),
                             password = password
                         ) { result, message ->
+                            isLoading = false
                             if (result) {
                                 // Login OK, sesión ya guardada en Preferences
                                 navController.navigate(MainScreenRoute) {
@@ -138,20 +148,28 @@ fun LoginScreen(
                 Text(
                     text = "¿No tienes una cuenta? Crea una",
                     style = MaterialTheme.typography.labelSmall,
-                    color = color.primary,
+                    color = colors.primary,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable { navController.navigate(RegisterScreenRoute) }
                 )
             }
         }
+
+        // Overlay de carga
+        if (isLoading) {
+            LoadingOverlay(
+                colors = colors,
+                message = "Iniciando sesión..."
+            )
+        }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-@Preview
-fun LoginScrenPreview() {
-    RecipeTheme {
+fun LoginScreenPreview() {
+    MyGameShelfTheme {
         LoginScreen(
             navController = rememberNavController(),
             contentPadding = PaddingValues(0.dp)

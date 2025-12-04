@@ -17,14 +17,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.screens.Auth.components.AuthBackGround
 import com.example.mygameshelf.ui.screens.Auth.components.AuthCard
 import com.example.mygameshelf.ui.screens.Auth.components.AuthTextField
 import com.example.mygameshelf.ui.screens.Auth.components.PrimaryButton
 import com.example.mygameshelf.ui.theme.MainScreenRoute
+import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 
@@ -34,15 +38,20 @@ fun RegisterScreen(
     contentPadding: PaddingValues
 ) {
     val viewModel: AuthViewModel = viewModel()
-    val color = MaterialTheme.colorScheme
+    val colors = MaterialTheme.colorScheme
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding)
+    ) {
         AuthBackGround()
 
         Box(
@@ -122,12 +131,15 @@ fun RegisterScreen(
                             return@PrimaryButton
                         }
 
+                        isLoading = true
+
                         // Llamada al ViewModel
                         viewModel.register(
                             name = name.trim(),
                             email = email.trim(),
                             password = password
                         ) { result, message ->
+                            isLoading = false
                             if (result) {
                                 // Ya guardó sesión en Preferences -> ir al Home
                                 navController.navigate(MainScreenRoute) {
@@ -163,12 +175,30 @@ fun RegisterScreen(
                 Text(
                     text = "¿Ya tienes cuenta? Inicia sesión",
                     style = MaterialTheme.typography.labelSmall,
-                    color = color.primary,
+                    color = colors.primary,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable { navController.popBackStack() }
                 )
             }
         }
+
+        if (isLoading) {
+            LoadingOverlay(
+                colors = colors,
+                message = "Creando tu cuenta..."
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RegisterScreenPreview() {
+    MyGameShelfTheme {
+        RegisterScreen(
+            navController = rememberNavController(),
+            contentPadding = PaddingValues(0.dp)
+        )
     }
 }
