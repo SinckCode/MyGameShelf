@@ -92,7 +92,7 @@ fun DetailGame(
                 )
             }
 
-            // ✅ BODY
+            // Body
             Column(
                 modifier = Modifier
                     .fillMaxSize()
