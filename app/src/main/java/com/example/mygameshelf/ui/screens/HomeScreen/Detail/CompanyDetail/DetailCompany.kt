@@ -1,4 +1,4 @@
-package com.example.mygameshelf.ui.screens.HomeScreen.Detail
+package com.example.mygameshelf.ui.screens.HomeScreen.Detail.CompanyDetail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

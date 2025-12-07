@@ -21,8 +21,8 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.mygameshelf.ui.screens.Auth.LoginScreen
 import com.example.mygameshelf.ui.screens.Auth.RegisterScreen
-import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailCompany
-import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailGame
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.CompanyDetail.DetailCompany
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.GameDetail.DetailGame
 import com.example.mygameshelf.ui.screens.HomeScreen.ListView.CreateListView.CreateListView
 import com.example.mygameshelf.ui.screens.HomeScreen.ListView.ListView
 import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.AddList.AddList
