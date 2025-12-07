@@ -133,6 +133,38 @@ fun ListView(
                     )
                 }
             }
+
+            // Mensaje de error de la API
+            uiState.error?.let { errorMsg ->
+                Text(
+                    text = errorMsg,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+
+            // Estado vacío
+            if (!uiState.isLoading && uiState.playlists.isEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Todavía no tienes playlists creadas.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = muted
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Toca el botón + para crear tu primera lista.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = muted
+                    )
+                }
+            }
         }
     }
 }
