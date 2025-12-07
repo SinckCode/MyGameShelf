@@ -45,7 +45,6 @@ fun ListView(
         viewModel.loadPlaylists()
     }
 
-    // Paleta gamer
     val bgGradient = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF020617),
@@ -61,6 +60,14 @@ fun ListView(
             .padding(contentPadding)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
+        // Overlay de carga
+        if (uiState.isLoading) {
+            LoadingOverlay(
+                colors = MaterialTheme.colorScheme,
+                message = "Cargando tus playlists..."
+            )
+        }
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
