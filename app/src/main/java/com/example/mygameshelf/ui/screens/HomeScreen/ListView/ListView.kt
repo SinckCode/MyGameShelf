@@ -39,17 +39,25 @@ fun ListView(
     contentPadding: PaddingValues,
     viewModel: PlaylistsViewModel = viewModel()
 ) {
-    // Estado que viene del ViewModel
     val uiState by viewModel.playlistsState.collectAsState()
 
-    // Cuando entras por primera vez, se cargan las playlists del usuario
     LaunchedEffect(Unit) {
         viewModel.loadPlaylists()
     }
 
+    // Paleta gamer
+    val bgGradient = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF020617),
+            Color(0xFF020617),
+            Color(0xFF0B1120)
+        )
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(bgGradient)
             .padding(contentPadding)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
@@ -58,7 +66,8 @@ fun ListView(
         ) {
             Text(
                 text = "Your Library",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
             )
         }
     }
