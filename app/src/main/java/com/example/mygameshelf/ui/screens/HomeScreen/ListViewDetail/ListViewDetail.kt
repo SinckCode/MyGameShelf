@@ -1,22 +1,19 @@
 package com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail
 
-import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowLeft
-import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,21 +21,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
-import com.example.mygameshelf.domain.dtos.game.GameDto
 import com.example.mygameshelf.ui.components.LoadingOverlay
-import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.Components.HeaderLst
-import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
+import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.Components.InListGame
 import com.example.mygameshelf.ui.theme.AddListRoute
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
@@ -112,104 +103,105 @@ fun ListViewDetail(
                         .fillMaxSize()
                 )
             }
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 12.dp)
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Título
 
-                Text(
-                    text = playlistName
-                        ?: playlistUi.detail?.name
-                        ?: "Lista sin nombre",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier
-                            .padding(vertical = 10.dp)
-                    )
-                // Error de playlist
-                playlistUi.error?.let { errorMsg ->
+                // ---------- TÍTULO ----------
+                item {
                     Text(
-                        text = errorMsg,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 8.dp)
+                        text = playlistName
+                            ?: playlistUi.detail?.name
+                            ?: "Lista sin nombre",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(vertical = 10.dp)
                     )
                 }
 
-                //Mosaico
+                // ---------- MOSAICO ----------
+
                 val previewGames = gamesInPlaylist.takeLast(4)
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 20.dp)
-                ) {
-                    Column(
+                item {
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .background(Color(0xFF6366F1))
-                            .size(250.dp)
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
                     ) {
+                        Column(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(Color(0xFFA855F7))
+                                .size(250.dp)
+                                .padding(2.dp)
+                        ) {
 
-                        // Fila 1
-                        Row(modifier = Modifier.weight(1f)) {
+                            // Fila 1
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))) {
 
-                            if (previewGames.size > 0) {
-                                AsyncImage(
-                                    model = previewGames[0].imagenURL,
-                                    contentDescription = previewGames[0].nombre,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                    contentScale = ContentScale.Crop
-                                )
+                                if (previewGames.size > 0) {
+                                    AsyncImage(
+                                        model = previewGames[0].imagenURL,
+                                        contentDescription = previewGames[0].nombre,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+
+                                if (previewGames.size > 1) {
+                                    AsyncImage(
+                                        model = previewGames[1].imagenURL,
+                                        contentDescription = previewGames[1].nombre,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             }
 
-                            if (previewGames.size > 1) {
-                                AsyncImage(
-                                    model = previewGames[1].imagenURL,
-                                    contentDescription = previewGames[1].nombre,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                        }
+                            // Fila 2
+                            Row(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(bottomStart = 18.dp, bottomEnd = 18.dp))) {
 
-                        // Fila 2
-                        Row(modifier = Modifier.weight(1f)) {
+                                if (previewGames.size > 2) {
+                                    AsyncImage(
+                                        model = previewGames[2].imagenURL,
+                                        contentDescription = previewGames[2].nombre,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
 
-                            if (previewGames.size > 2) {
-                                AsyncImage(
-                                    model = previewGames[2].imagenURL,
-                                    contentDescription = previewGames[2].nombre,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-
-                            if (previewGames.size > 3) {
-                                AsyncImage(
-                                    model = previewGames[3].imagenURL,
-                                    contentDescription = previewGames[3].nombre,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                    contentScale = ContentScale.Crop
-                                )
+                                if (previewGames.size > 3) {
+                                    AsyncImage(
+                                        model = previewGames[3].imagenURL,
+                                        contentDescription = previewGames[3].nombre,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             }
                         }
                     }
-                }
 
-                //Agregar juegos
-                Button(
+                    //Agregar juegos
+                    Button(
                         onClick = {
                             if (playlistId != null) {
                                 navController.currentBackStackEntry
@@ -222,7 +214,6 @@ fun ListViewDetail(
                                         ?.set("selectedPlaylistName", name)
                                 }
 
-                                // 🔹 Mandamos también los gameIds actuales para que AddList los marque
                                 val currentIds = playlistUi.detail?.gameIds ?: emptyList()
                                 navController.currentBackStackEntry
                                     ?.savedStateHandle
@@ -233,57 +224,43 @@ fun ListViewDetail(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            ,
+                            .padding(top = 5.dp, bottom = 10.dp),
+                        enabled = playlistId != null,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF6366F1),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Agregar juegos a la lista")
+                    }
+                }
+
+                // ---------- BOTÓN ----------
+                item {
+                    Button(
+                        onClick = { /* tu navegación */ },
+                        modifier = Modifier.fillMaxWidth(),
                         enabled = playlistId != null
                     ) {
                         Text("Agregar juegos a la lista")
                     }
+                }
 
+                // ---------- RESUMEN ----------
+                item {
+                    Text(
+                        text = "Juegos en esta lista: ${gamesInPlaylist.size}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
 
-                // Resumen
-                Text(
-                    text = "Juegos en esta lista: ${gamesInPlaylist.size}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                when {
-                    gamesInPlaylist.isEmpty() && !playlistUi.isLoading -> {
-                        Text(
-                            text = "Aún no has agregado juegos a esta lista.",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-
-                    else -> {
-                        // Lista de juegos de la playlist
-                        LazyColumn(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(gamesInPlaylist) { game ->
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 4.dp)
-                                ) {
-                                    Text(
-                                        text = game.nombre,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "⭐ ${game.rating}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
-                        }
-                    }
+                // ---------- JUEGOS ----------
+                items(gamesInPlaylist) { game ->
+                    InListGame(
+                        game = game,
+                        navController = navController
+                    )
                 }
             }
         }
