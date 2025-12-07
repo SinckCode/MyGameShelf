@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -43,6 +47,7 @@ import com.example.mygameshelf.domain.dtos.company.CompanyDto
 import com.example.mygameshelf.domain.dtos.game.GameDto
 import com.example.mygameshelf.ui.screens.HomeScreen.Detail.GameDetail.Components.GameCard
 import com.example.mygameshelf.ui.screens.HomeScreen.HomeScreen
+import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
 import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 import kotlin.collections.List
@@ -50,6 +55,7 @@ import kotlin.collections.List
 @Composable
 fun DetailGame(
     gameId: Int?,
+    navController: NavHostController,
     gamesViewModel: GamesViewModel = viewModel(),
 ) {
     val gamesState by gamesViewModel.uiState.collectAsState()
@@ -62,137 +68,145 @@ fun DetailGame(
         }
     } ?: emptyList()
 
-    Column(
-    ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "MyGameShelf",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ),
-                modifier = Modifier.weight(1f)
-            )
-
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Cerrar sesión"
-            )
+    Scaffold(
+        bottomBar = {
+            MyBottomBar(navController = navController)
         }
+    ) { paddingValues ->
 
-        //Body
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp)
-                .padding(top = 5.dp, bottom = 25.dp)
+                .padding(paddingValues)
+                .padding(top = 20.dp)
         ) {
 
-
-            Text(
-                text = game?.nombre ?: "Cargando...",
-                color = Color.Black,
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(bottom = 5.dp)
-            )
-
-            Box(
+            // Header
+            Row(
                 modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(Color.LightGray)
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .padding(horizontal = 15.dp, vertical = 15.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                game?.let {
-                    AsyncImage(
-                        model = it.imagenURL,
-                        contentDescription = it.nombre,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
+                Text(
+                    text = "MyGameShelf",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.ExtraBold
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Cerrar sesión"
+                )
             }
 
+            // ✅ BODY
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp)
-            )
-            {
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 12.dp)
+            ) {
+
                 Text(
-                    text = "Rating: ${game?.rating} ⭐",
+                    text = game?.nombre ?: "Cargando...",
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
+                    fontSize = 28.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
 
-                Text(
-                    text = "Género: ${game?.genero}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-
-                Text(
-                    text = "Precio: $${game?.precio}",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-
-                Text(
-                    text = "Plataformas disponibles:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 5.dp)
-                )
-
-                Text(
-                    text = "${game?.plataformas?.joinToString(", ")}",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(bottom = 10.dp)
-                )
-
-                Text(
-                    text = "Descripción:",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
-
-                Text(
-                    text = "${game?.descripcion}",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ✅ TÍTULO DEL CARRUSEL
-            if (relatedGames.isNotEmpty()) {
-                Text(
-                    text = "Juegos similares",
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 22.sp,
-                    modifier = Modifier.padding(bottom = 10.dp)
-                )
-
-                // ✅ CARRUSEL POR GÉNERO
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(horizontal = 4.dp)
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .clip(RoundedCornerShape(22.dp))
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .background(Color.LightGray)
                 ) {
-                    items(relatedGames) { relatedGame ->
-                        GameCard(gameId = relatedGame.id)
+                    game?.let {
+                        AsyncImage(
+                            model = it.imagenURL,
+                            contentDescription = it.nombre,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                }
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+
+                    Text("Rating: ${game?.rating} ⭐",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(top = 5.dp, bottom = 3.dp)
+                    )
+
+                    Text("Género: ${game?.genero}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(top = 5.dp, bottom = 3.dp)
+                    )
+                    Text("Precio: $${game?.precio}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .padding(top = 5.dp, bottom = 3.dp)
+                    )
+
+                    Text(
+                        text = "Plataformas disponibles:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 1.dp, bottom = 3.dp)
+                    )
+
+                    Text(
+                        text = game?.plataformas?.joinToString(", ") ?: "",
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 5.dp, bottom = 3.dp)
+                    )
+
+                    Text("Descripción:",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 1.dp, bottom = 3.dp)
+                    )
+
+                    Text(
+                        text = game?.descripcion ?: "",
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 5.dp, bottom = 3.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // ✅ CARRUSEL
+                if (relatedGames.isNotEmpty()) {
+                    Text(
+                        text = "Juegos similares",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 22.sp,
+                        modifier = Modifier.padding(bottom = 10.dp)
+                    )
+
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(relatedGames) { relatedGame ->
+                            GameCard(gameId = relatedGame.id)
+                        }
                     }
                 }
             }
@@ -202,8 +216,13 @@ fun DetailGame(
 
 
 
+
 @Preview(showBackground = true)
 @Composable
 fun DetailGamePreview() {
-    DetailGame(5)
+    val navController = rememberNavController()
+    DetailGame(
+        gameId = 5,
+        navController = navController
+    )
 }

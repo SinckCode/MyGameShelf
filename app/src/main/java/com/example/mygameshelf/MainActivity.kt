@@ -136,7 +136,8 @@ class MainActivity : ComponentActivity() {
                             // ---------- DETALLE DE GAME / COMPANY ----------
                             composable<DetailGameRoute> { backStackEntry ->
                                 val args: DetailGameRoute = backStackEntry.toRoute()
-                                DetailGame(gameId = args.gameId)
+                                DetailGame(gameId = args.gameId,
+                                    navController = navController)
                             }
 
                             composable<DetailCompanyRoute> { backStackEntry ->
