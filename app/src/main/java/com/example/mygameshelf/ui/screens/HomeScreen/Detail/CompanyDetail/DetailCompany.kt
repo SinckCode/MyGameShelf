@@ -55,6 +55,7 @@ fun DetailCompany(
         }
     ) { paddingValues ->
 
+        //Header
         Column(
             modifier = Modifier
                 .fillMaxSize()
