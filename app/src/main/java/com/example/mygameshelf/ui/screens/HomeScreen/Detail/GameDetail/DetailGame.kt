@@ -4,14 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -31,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,16 +38,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import com.example.mygameshelf.domain.dtos.company.CompanyDto
-import com.example.mygameshelf.domain.dtos.game.GameDto
-import com.example.mygameshelf.ui.screens.HomeScreen.Detail.GameDetail.Components.GameCard
-import com.example.mygameshelf.ui.screens.HomeScreen.HomeScreen
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.Components.GameCard
+import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
 import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
-import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
-import kotlin.collections.List
 
 @Composable
 fun DetailGame(
@@ -81,7 +72,6 @@ fun DetailGame(
                 .padding(top = 20.dp)
         ) {
 
-            // Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,7 +88,7 @@ fun DetailGame(
 
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Cerrar sesión"
+                    contentDescription = "Agregar a lista"
                 )
             }
 
@@ -138,7 +128,10 @@ fun DetailGame(
                     }
                 }
 
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
 
                     Text("Rating: ${game?.rating} ⭐",
                         fontSize = 15.sp,
@@ -220,9 +213,8 @@ fun DetailGame(
 @Preview(showBackground = true)
 @Composable
 fun DetailGamePreview() {
-    val navController = rememberNavController()
     DetailGame(
         gameId = 5,
-        navController = navController
+        navController = rememberNavController()
     )
 }

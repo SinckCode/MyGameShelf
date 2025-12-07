@@ -1,4 +1,4 @@
-package com.example.mygameshelf.ui.screens.HomeScreen.Detail.GameDetail.Components
+package com.example.mygameshelf.ui.screens.HomeScreen.Detail.Components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -68,7 +68,7 @@ fun GameCard(
                     model = gameSelected.imagenURL,
                     contentDescription = gameSelected.nombre,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Fit
                 )
 
                 Box(

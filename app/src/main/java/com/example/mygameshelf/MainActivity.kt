@@ -142,7 +142,8 @@ class MainActivity : ComponentActivity() {
 
                             composable<DetailCompanyRoute> { backStackEntry ->
                                 val args: DetailCompanyRoute = backStackEntry.toRoute()
-                                DetailCompany(companyId = args.companyId)
+                                DetailCompany(companyId = args.companyId,
+                                    navController = navController)
                             }
                         }
                     }
