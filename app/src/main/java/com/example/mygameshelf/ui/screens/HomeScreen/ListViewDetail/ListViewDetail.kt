@@ -110,7 +110,7 @@ fun ListViewDetail(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                // ---------- TÍTULO ----------
+                // Titulo
                 item {
                     Text(
                         text = playlistName
@@ -121,7 +121,7 @@ fun ListViewDetail(
                     )
                 }
 
-                // ---------- MOSAICO ----------
+                //Mosaico
 
                 val previewGames = gamesInPlaylist.takeLast(4)
 
@@ -230,17 +230,6 @@ fun ListViewDetail(
                             containerColor = Color(0xFF6366F1),
                             contentColor = Color.White
                         )
-                    ) {
-                        Text("Agregar juegos a la lista")
-                    }
-                }
-
-                // ---------- BOTÓN ----------
-                item {
-                    Button(
-                        onClick = { /* tu navegación */ },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = playlistId != null
                     ) {
                         Text("Agregar juegos a la lista")
                     }
