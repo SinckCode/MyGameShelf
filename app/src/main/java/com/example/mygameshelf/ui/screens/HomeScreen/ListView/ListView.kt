@@ -53,6 +53,10 @@ fun ListView(
         )
     )
 
+    val accent = Color(0xFF6366F1)
+    val accentSoft = Color(0xFFA855F7)
+    val muted = Color(0xFF94A3B8)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +64,6 @@ fun ListView(
             .padding(contentPadding)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // Overlay de carga
         if (uiState.isLoading) {
             LoadingOverlay(
                 colors = MaterialTheme.colorScheme,
@@ -71,11 +74,46 @@ fun ListView(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Your Library",
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White
-            )
+            // Header gamer (sin iconos todavía)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                listOf(accent, accentSoft)
+                            ),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "MG",
+                        color = Color.White,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "Your Library",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "Organiza tus listas gamer",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = muted
+                    )
+                }
+            }
         }
     }
 }
