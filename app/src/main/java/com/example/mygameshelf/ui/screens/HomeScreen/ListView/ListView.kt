@@ -134,7 +134,6 @@ fun ListView(
                 }
             }
 
-            // Mensaje de error de la API
             uiState.error?.let { errorMsg ->
                 Text(
                     text = errorMsg,
@@ -144,7 +143,6 @@ fun ListView(
                 )
             }
 
-            // Estado vacío
             if (!uiState.isLoading && uiState.playlists.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -163,6 +161,43 @@ fun ListView(
                         style = MaterialTheme.typography.bodySmall,
                         color = muted
                     )
+                }
+            } else {
+                // Lista simple (sin tarjetas aún)
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.playlists) { playlist ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    navController.currentBackStackEntry
+                                        ?.savedStateHandle
+                                        ?.apply {
+                                            set("selectedPlaylistId", playlist.id)
+                                            set("selectedPlaylistName", playlist.name)
+                                        }
+                                    navController.navigate(ListDetailRoute)
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = playlist.name,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "Juegos: ${playlist.gamesCount}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = accent
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
