@@ -74,7 +74,6 @@ fun ListView(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Header gamer (sin iconos todavía)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -101,7 +100,9 @@ fun ListView(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
                         text = "Your Library",
                         style = MaterialTheme.typography.titleLarge,
@@ -111,6 +112,24 @@ fun ListView(
                         text = "Organiza tus listas gamer",
                         style = MaterialTheme.typography.bodySmall,
                         color = muted
+                    )
+                }
+
+                IconButton(onClick = { /* TODO: búsqueda futura */ }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Search,
+                        contentDescription = "Buscar listas",
+                        tint = Color.White
+                    )
+                }
+
+                IconButton(
+                    onClick = { navController.navigate(CreateListRoute) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = "Nueva lista",
+                        tint = Color.White
                     )
                 }
             }
