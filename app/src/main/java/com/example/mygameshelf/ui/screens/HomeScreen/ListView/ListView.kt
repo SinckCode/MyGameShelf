@@ -47,15 +47,16 @@ fun ListView(
 
     val bgGradient = Brush.verticalGradient(
         colors = listOf(
+            Color(0xFF020617), // fondo casi negro
             Color(0xFF020617),
-            Color(0xFF020617),
-            Color(0xFF0B1120)
+            Color(0xFF0B1120)  // un poco más claro hacia abajo
         )
     )
 
-    val accent = Color(0xFF6366F1)
-    val accentSoft = Color(0xFFA855F7)
-    val muted = Color(0xFF94A3B8)
+    val accent = Color(0xFF6366F1)      // morado/azul gamer
+    val accentSoft = Color(0xFFA855F7)  // morado suave
+    val muted = Color(0xFF94A3B8)       // texto secundario
+    val cardBg = Color(0xFF0F172A)      // tarjetas
 
     Box(
         modifier = Modifier
@@ -64,6 +65,7 @@ fun ListView(
             .padding(contentPadding)
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
+
         if (uiState.isLoading) {
             LoadingOverlay(
                 colors = MaterialTheme.colorScheme,
@@ -74,12 +76,15 @@ fun ListView(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+
+            // ===== HEADER GAMER =====
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Círculo tipo avatar con gradiente
                 Box(
                     modifier = Modifier
                         .size(42.dp)
@@ -115,7 +120,8 @@ fun ListView(
                     )
                 }
 
-                IconButton(onClick = { /* TODO: búsqueda futura */ }) {
+                // Botón de búsqueda (por ahora solo visual)
+                IconButton(onClick = { /* TODO: búsqueda más adelante */ }) {
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = "Buscar listas",
@@ -123,6 +129,7 @@ fun ListView(
                     )
                 }
 
+                // Botón para crear lista (misma lógica de antes)
                 IconButton(
                     onClick = { navController.navigate(CreateListRoute) }
                 ) {
@@ -134,6 +141,7 @@ fun ListView(
                 }
             }
 
+            // Mensaje de error de la API
             uiState.error?.let { errorMsg ->
                 Text(
                     text = errorMsg,
@@ -143,58 +151,93 @@ fun ListView(
                 )
             }
 
-            if (!uiState.isLoading && uiState.playlists.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Todavía no tienes playlists creadas.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = muted
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Toca el botón + para crear tu primera lista.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = muted
-                    )
+            when {
+                !uiState.isLoading && uiState.playlists.isEmpty() -> {
+                    // Estado vacío estilizado
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Todavía no tienes playlists creadas.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = muted
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Toca el botón + para crear tu primera lista.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = muted
+                        )
+                    }
                 }
-            } else {
-                // Lista simple (sin tarjetas aún)
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.playlists) { playlist ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navController.currentBackStackEntry
-                                        ?.savedStateHandle
-                                        ?.apply {
-                                            set("selectedPlaylistId", playlist.id)
-                                            set("selectedPlaylistName", playlist.name)
-                                        }
-                                    navController.navigate(ListDetailRoute)
+
+                else -> {
+                    // ===== LISTA DE PLAYLISTS =====
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(uiState.playlists) { playlist ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navController.currentBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.apply {
+                                                set("selectedPlaylistId", playlist.id)
+                                                set("selectedPlaylistName", playlist.name)
+                                            }
+                                        navController.navigate(ListDetailRoute)
+                                    },
+                                shape = RoundedCornerShape(18.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = cardBg
+                                ),
+                                elevation = CardDefaults.cardElevation(
+                                    defaultElevation = 3.dp
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    // Mini “portada” de la lista
+                                    Box(
+                                        modifier = Modifier
+                                            .size(46.dp)
+                                            .background(
+                                                brush = Brush.linearGradient(
+                                                    listOf(accent, accentSoft)
+                                                ),
+                                                shape = RoundedCornerShape(14.dp)
+                                            )
+                                    )
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = playlist.name,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = Color.White,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "Juegos: ${playlist.gamesCount}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = accent
+                                        )
+                                    }
                                 }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = playlist.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "Juegos: ${playlist.gamesCount}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = accent
-                                )
                             }
                         }
                     }
