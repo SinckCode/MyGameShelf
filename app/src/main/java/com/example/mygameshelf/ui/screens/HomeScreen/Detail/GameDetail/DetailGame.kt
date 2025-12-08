@@ -62,11 +62,14 @@ fun DetailGame(
     Scaffold(
         bottomBar = {
             MyBottomBar(navController = navController)
-        }
+        },
+        modifier = Modifier
+            .fillMaxSize()
     ) { paddingValues ->
 
         Column(
             modifier = Modifier
+                .background(Color(0xFF020617))
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(top = 20.dp)
@@ -80,6 +83,7 @@ fun DetailGame(
             ) {
                 Text(
                     text = "MyGameShelf",
+                    color = Color.White,
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
                     ),
@@ -104,6 +108,7 @@ fun DetailGame(
                 Text(
                     text = game?.nombre ?: "Cargando...",
                     fontWeight = FontWeight.Bold,
+                    color = Color.White,
                     fontSize = 28.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -116,14 +121,17 @@ fun DetailGame(
                         .clip(RoundedCornerShape(22.dp))
                         .fillMaxWidth()
                         .height(250.dp)
-                        .background(Color.LightGray)
+                        .background(Color(0xFFA855F7))
                 ) {
                     game?.let {
                         AsyncImage(
                             model = it.imagenURL,
                             contentDescription = it.nombre,
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(24.dp))
+                                .fillMaxSize()
+                                .padding(1.dp)
                         )
                     }
                 }
@@ -136,6 +144,7 @@ fun DetailGame(
                     Text("Rating: ${game?.rating} ⭐",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 3.dp)
                     )
@@ -143,12 +152,14 @@ fun DetailGame(
                     Text("Género: ${game?.genero}",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 3.dp)
                     )
                     Text("Precio: $${game?.precio}",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 3.dp)
                     )
@@ -156,6 +167,7 @@ fun DetailGame(
                     Text(
                         text = "Plataformas disponibles:",
                         fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         fontSize = 15.sp,
                         modifier = Modifier
                             .padding(top = 1.dp, bottom = 3.dp)
@@ -164,6 +176,7 @@ fun DetailGame(
                     Text(
                         text = game?.plataformas?.joinToString(", ") ?: "",
                         fontSize = 15.sp,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 3.dp)
                     )
@@ -171,6 +184,7 @@ fun DetailGame(
                     Text("Descripción:",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 1.dp, bottom = 3.dp)
                     )
@@ -178,6 +192,7 @@ fun DetailGame(
                     Text(
                         text = game?.descripcion ?: "",
                         fontSize = 15.sp,
+                        color = Color.White,
                         modifier = Modifier
                             .padding(top = 5.dp, bottom = 3.dp)
                     )
@@ -191,6 +206,7 @@ fun DetailGame(
                         text = "Juegos similares",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
+                        color = Color.White,
                         modifier = Modifier.padding(bottom = 10.dp)
                     )
 

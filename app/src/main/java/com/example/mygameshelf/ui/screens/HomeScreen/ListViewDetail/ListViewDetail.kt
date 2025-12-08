@@ -231,7 +231,8 @@ fun ListViewDetail(
                             contentColor = Color.White
                         )
                     ) {
-                        Text("Agregar juegos a la lista")
+                        Text(text = "Agregar juegos a la lista",
+                            color = Color.White)
                     }
                 }
 
