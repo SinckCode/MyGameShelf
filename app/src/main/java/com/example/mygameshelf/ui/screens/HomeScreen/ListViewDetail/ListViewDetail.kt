@@ -235,7 +235,6 @@ fun ListViewDetail(
                     }
                 }
 
-                // ---------- RESUMEN ----------
                 item {
                     Text(
                         text = "Juegos en esta lista: ${gamesInPlaylist.size}",
@@ -244,7 +243,7 @@ fun ListViewDetail(
                     )
                 }
 
-                // ---------- JUEGOS ----------
+                // Lista de Juegos
                 items(gamesInPlaylist) { game ->
                     InListGame(
                         game = game,
