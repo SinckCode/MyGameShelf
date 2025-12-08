@@ -1,5 +1,6 @@
 package com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.AddList
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,9 @@ import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
+import com.example.mygameshelf.ui.screens.HomeScreen.ListViewDetail.Components.CheckListSelectableGame
 
 @Composable
 fun AddList(
@@ -55,93 +59,32 @@ fun AddList(
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .background(Color(0xFF020617))
             .padding(contentPadding)
-            .padding(16.dp)
+            .padding(top = 10.dp)
     ) {
-        if (gamesState.isLoading) {
-            LoadingOverlay(
-                colors = MaterialTheme.colorScheme,
-                message = "Cargando juegos..."
-            )
-        }
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .padding( vertical = 15.dp, horizontal = 20.dp)
         ) {
             Text(
                 text = playlistName?.let { "Agregar juegos a: $it" }
                     ?: "Agregar juegos a la lista",
                 style = MaterialTheme.typography.titleLarge
             )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            when {
-                gamesState.error != null -> {
-                    Text(
-                        text = gamesState.error ?: "Error al cargar juegos",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-
-                gamesState.games.isEmpty() -> {
-                    Text("No hay juegos disponibles todavía.")
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(gamesState.games) { game ->
-                            val checked = selectedIds.contains(game.id)
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        selectedIds =
-                                            if (checked) selectedIds - game.id
-                                            else selectedIds + game.id
-                                    }
-                                    .padding(vertical = 4.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = checked,
-                                    onCheckedChange = { isChecked ->
-                                        selectedIds =
-                                            if (isChecked) selectedIds + game.id
-                                            else selectedIds - game.id
-                                    }
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column {
-                                    Text(
-                                        text = game.nombre,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                    Text(
-                                        text = "⭐ ${game.rating}",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
                     onClick = { navController.popBackStack() },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6366F1),
+                        contentColor = Color.White)
                 ) {
                     Text("Cancelar")
                 }
@@ -163,10 +106,57 @@ fun AddList(
                         }
                     },
                     modifier = Modifier.weight(1f),
-                    enabled = playlistId != null && selectedIds.isNotEmpty()
+                    enabled = playlistId != null && selectedIds.isNotEmpty(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF6366F1),
+                        contentColor = Color.White)
                 ) {
                     Text("Guardar")
                 }
+            }
+
+            when {
+                gamesState.error != null -> {
+                    Text(
+                        text = gamesState.error ?: "Error al cargar juegos",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+
+                gamesState.games.isEmpty() -> {
+                    Text("No hay juegos disponibles todavía.")
+                }
+
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 15.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(gamesState.games) { game ->
+                            //Esta parte
+                            val checked = selectedIds.contains(game.id)
+
+                            CheckListSelectableGame(
+                                game = game,
+                                checked = checked,
+                                onCheckedChange = { isChecked ->
+                                    selectedIds =
+                                        if (isChecked) selectedIds + game.id
+                                        else selectedIds - game.id
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (gamesState.isLoading) {
+                LoadingOverlay(
+                    colors = MaterialTheme.colorScheme,
+                    message = "Cargando juegos..."
+                )
             }
         }
     }

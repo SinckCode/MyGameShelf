@@ -21,7 +21,7 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.mygameshelf.ui.screens.Auth.LoginScreen
 import com.example.mygameshelf.ui.screens.Auth.RegisterScreen
-import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailCompany
+import com.example.mygameshelf.ui.screens.HomeScreen.Detail.CompanyDetail.DetailCompany
 import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailGame
 import com.example.mygameshelf.ui.screens.HomeScreen.ListView.CreateListView.CreateListView
 import com.example.mygameshelf.ui.screens.HomeScreen.ListView.ListView
@@ -136,12 +136,14 @@ class MainActivity : ComponentActivity() {
                             // ---------- DETALLE DE GAME / COMPANY ----------
                             composable<DetailGameRoute> { backStackEntry ->
                                 val args: DetailGameRoute = backStackEntry.toRoute()
-                                DetailGame(gameId = args.gameId)
+                                DetailGame(gameId = args.gameId,
+                                    navController = navController)
                             }
 
                             composable<DetailCompanyRoute> { backStackEntry ->
                                 val args: DetailCompanyRoute = backStackEntry.toRoute()
-                                DetailCompany(companyId = args.companyId)
+                                DetailCompany(companyId = args.companyId,
+                                    navController = navController)
                             }
                         }
                     }

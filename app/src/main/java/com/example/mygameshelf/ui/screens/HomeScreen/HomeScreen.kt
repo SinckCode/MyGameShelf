@@ -56,6 +56,7 @@ import com.example.mygameshelf.ui.components.CustomOutlinedTextField
 import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.screens.Auth.components.PrimaryButton
 import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
+import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
 import com.example.mygameshelf.ui.theme.DetailCompanyRoute
 import com.example.mygameshelf.ui.theme.DetailGameRoute
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
