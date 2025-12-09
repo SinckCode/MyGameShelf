@@ -33,6 +33,7 @@ import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
+import com.example.mygameshelf.ui.screens.Auth.accentSoft
 
 @Composable
 fun LoginScreen(
@@ -63,8 +64,10 @@ fun LoginScreen(
             .fillMaxSize()
             .padding(contentPadding)
     ) {
+        // Fondo gamer con gradiente
         AuthBackGround()
 
+        // Card centrada
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,17 +141,17 @@ fun LoginScreen(
                     Text(
                         text = msg,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error,
+                        color = colors.error,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
 
                 Text(
                     text = "¿No tienes una cuenta? Crea una",
                     style = MaterialTheme.typography.labelSmall,
-                    color = colors.primary,
+                    color = accentSoft, // morado suave gamer
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable { navController.navigate(RegisterScreenRoute) }
