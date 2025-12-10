@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.theme.CreateListRoute
 import com.example.mygameshelf.ui.theme.ListDetailRoute
+import com.example.mygameshelf.ui.theme.UserViewRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
 
@@ -104,7 +105,8 @@ fun ListView(
                                 listOf(accent, accentSoft)
                             ),
                             shape = CircleShape
-                        ),
+                        )
+                        .clickable{ navController.navigate(UserViewRoute) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
