@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -31,12 +32,14 @@ import androidx.navigation.NavController
 import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.theme.CreateListRoute
 import com.example.mygameshelf.ui.theme.ListDetailRoute
+import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
 
 @Composable
 fun ListView(
     navController: NavController,
     contentPadding: PaddingValues,
+    authViewModel: AuthViewModel = viewModel(),
     viewModel: PlaylistsViewModel = viewModel()
 ) {
     val uiState by viewModel.playlistsState.collectAsState()
@@ -57,6 +60,12 @@ fun ListView(
     val accentSoft = Color(0xFFA855F7)  // morado suave
     val muted = Color(0xFF94A3B8)       // texto secundario
     val cardBg = Color(0xFF0F172A)      // tarjetas
+
+    val userName = remember { authViewModel.getUserName() }
+
+
+
+    val initial = userName.firstOrNull()?.uppercase() ?: "?"
 
     Box(
         modifier = Modifier
@@ -97,7 +106,7 @@ fun ListView(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "MG",
+                        text = initial,
                         color = Color.White,
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -120,14 +129,7 @@ fun ListView(
                     )
                 }
 
-                // Botón de búsqueda (por ahora solo visual)
-                IconButton(onClick = { /* TODO: búsqueda más adelante */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Search,
-                        contentDescription = "Buscar listas",
-                        tint = Color.White
-                    )
-                }
+
 
                 // Botón para crear lista (misma lógica de antes)
                 IconButton(

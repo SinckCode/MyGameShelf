@@ -72,7 +72,8 @@ fun Header(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.08f)),
+                .background(Color.White.copy(alpha = 0.08f))
+                .clickable{ onProfileClick() },
             contentAlignment = Alignment.Center
         ) {
             Text(

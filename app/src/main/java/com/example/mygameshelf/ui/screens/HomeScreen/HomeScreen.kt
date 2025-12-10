@@ -356,20 +356,24 @@ private fun SectionTitle(text: String) {
 
 /**
  * Hero superior con imágenes de juegos y blackout
+ *  ✅ Versión protegida contra IndexOutOfBounds
  */
 @Composable
 private fun GamesHeroHeader(games: List<GameDto>) {
     val context = LocalContext.current
 
-    val imageUrls = remember(games) {
-        games.mapNotNull { it.imagenURL.takeIf { url -> url.isNotBlank() } }
-    }
+    // Lista de URLs actual
+    val imageUrls = games.mapNotNull { it.imagenURL.takeIf { url -> url.isNotBlank() } }
 
     var currentIndex by remember { mutableStateOf(0) }
 
     // Cambio automático de imagen cada 5s
     LaunchedEffect(imageUrls) {
+        // Siempre que cambie la lista, reseteamos el índice
+        currentIndex = 0
+
         if (imageUrls.size <= 1) return@LaunchedEffect
+
         while (true) {
             delay(5000L)
             currentIndex = (currentIndex + 1) % imageUrls.size
@@ -394,10 +398,14 @@ private fun GamesHeroHeader(games: List<GameDto>) {
         shape = MaterialTheme.shapes.large
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            if (imageUrls.isNotEmpty()) {
+
+            // 👇 Protegemos el acceso al índice
+            val url = imageUrls.getOrNull(currentIndex)
+
+            if (!url.isNullOrBlank()) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data(imageUrls[currentIndex])
+                        .data(url)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Juego destacado",
