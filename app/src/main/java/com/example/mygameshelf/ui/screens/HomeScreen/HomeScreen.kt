@@ -137,7 +137,7 @@ fun HomeScreen(
                     onLogout = {
                         authViewModel.logout()
                         navController.navigate(LoginScreenRoute) {
-                            // rompemos el grafo principal y volvemos limpio al login
+                            // rompemos el grafo principal y volvemos limpio al login yea
                             popUpTo(MainScreenRoute::class.qualifiedName!!) {
                                 inclusive = true
                             }
