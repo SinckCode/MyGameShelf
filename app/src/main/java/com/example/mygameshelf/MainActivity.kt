@@ -136,15 +136,22 @@ class MainActivity : ComponentActivity() {
                             // ---------- DETALLE DE GAME / COMPANY ----------
                             composable<DetailGameRoute> { backStackEntry ->
                                 val args: DetailGameRoute = backStackEntry.toRoute()
-                                DetailGame(gameId = args.gameId,
-                                    navController = navController)
+
+                                DetailGame(
+                                    gameId = args.gameId,
+                                    navController = navController
+                                )
                             }
 
                             composable<DetailCompanyRoute> { backStackEntry ->
                                 val args: DetailCompanyRoute = backStackEntry.toRoute()
-                                DetailCompany(companyId = args.companyId,
-                                    navController = navController)
+
+                                DetailCompany(
+                                    companyId = args.companyId,
+                                    navController = navController
+                                )
                             }
+
                         }
                     }
                 }

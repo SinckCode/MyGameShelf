@@ -31,6 +31,7 @@ import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 import com.example.mygameshelf.ui.theme.RegisterScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
+import com.example.mygameshelf.ui.screens.Auth.accentSoft
 
 @Composable
 fun RegisterScreen(
@@ -52,6 +53,7 @@ fun RegisterScreen(
             .fillMaxSize()
             .padding(contentPadding)
     ) {
+        // Fondo gamer compartido con Login
         AuthBackGround()
 
         Box(
@@ -165,17 +167,17 @@ fun RegisterScreen(
                     Text(
                         text = msg,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error,
+                        color = colors.error,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
 
                 Text(
                     text = "¿Ya tienes cuenta? Inicia sesión",
                     style = MaterialTheme.typography.labelSmall,
-                    color = colors.primary,
+                    color = accentSoft, // mismo morado suave que en Login
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable { navController.popBackStack() }

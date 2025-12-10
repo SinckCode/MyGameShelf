@@ -58,6 +58,7 @@ fun DetailCompany(
         //Header
         Column(
             modifier = Modifier
+                .background(Color(0xFF020617))
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(top = 20.dp)
@@ -74,7 +75,9 @@ fun DetailCompany(
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold
                     ),
-                    modifier = Modifier.weight(1f)
+                    color = Color.White,
+                    modifier = Modifier
+                        .weight(1f)
                 )
             }
 
@@ -93,6 +96,7 @@ fun DetailCompany(
                     fontSize = 28.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    color = Color.White,
                     modifier = Modifier.padding(bottom = 5.dp)
                 )
 
@@ -102,7 +106,8 @@ fun DetailCompany(
                         .clip(RoundedCornerShape(22.dp))
                         .fillMaxWidth()
                         .height(250.dp)
-                        .background(Color.LightGray)
+                        .background(Color(0xFFA855F7))
+                        .padding(1.dp)
                 ) {
                     company?.let {
                         AsyncImage(
@@ -118,27 +123,74 @@ fun DetailCompany(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-
-                    Text("Fundacion: ${company?.fundacion}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                    Box(
                         modifier = Modifier
-                            .padding(top = 5.dp, bottom = 3.dp)
-                    )
+                            .padding(vertical = 5.dp)
+                    ){
+                        Box (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(Color(0xFFA855F7))
+                                .padding(1.dp)
+                        ){
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background( Color(0xFF020617)),
+                                contentAlignment = Alignment.CenterStart
+                            ){
+                                Text("Fundacion: ${company?.fundacion}",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    modifier = Modifier
+                                        .padding(15.dp)
+                                )
+                            }
+                        }
+                    }
 
-                    Text("Historia:",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                    Box(
                         modifier = Modifier
-                            .padding(top = 1.dp, bottom = 3.dp)
-                    )
+                            .padding(vertical = 5.dp)
+                    ){
+                        Box (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(Color(0xFFA855F7))
+                                .padding(1.dp)
+                        ){
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background( Color(0xFF020617)),
+                                contentAlignment = Alignment.CenterStart
+                            ){
+                                Column {
+                                    Text("Historia:",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp,
+                                        color = Color.White,
+                                        modifier = Modifier
+                                            .padding(15.dp)
+                                    )
 
-                    Text(
-                        text = company?.historia ?: "",
-                        fontSize = 15.sp,
-                        modifier = Modifier
-                            .padding(top = 5.dp, bottom = 3.dp)
-                    )
+                                    Text(
+                                        text = company?.historia ?: "",
+                                        fontSize = 15.sp,
+                                        color = Color.White,
+                                        modifier = Modifier
+                                            .padding(15.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                 }
             }
         }

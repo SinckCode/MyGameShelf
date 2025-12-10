@@ -1,6 +1,7 @@
 package com.example.mygameshelf.ui.screens.HomeScreen.Detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +45,7 @@ import coil3.compose.AsyncImage
 import com.example.mygameshelf.ui.screens.HomeScreen.Detail.Components.GameCard
 import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
 import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
+import com.example.mygameshelf.ui.theme.AddListRoute
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 
 @Composable
@@ -91,10 +94,16 @@ fun DetailGame(
                     ),
                     modifier = Modifier.weight(1f)
                 )
-
+                //
                 Icon(
                     imageVector = Icons.Filled.Add,
-                    contentDescription = "Agregar a lista"
+                    contentDescription = "Agregar a lista",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable {
+                            navController.navigate(AddListRoute)
+                        }
                 )
             }
 
