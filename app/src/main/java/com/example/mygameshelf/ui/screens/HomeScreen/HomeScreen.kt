@@ -1,5 +1,6 @@
 package com.example.mygameshelf.ui.screens.HomeScreen
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,7 +57,6 @@ import com.example.mygameshelf.ui.components.CustomOutlinedTextField
 import com.example.mygameshelf.ui.components.LoadingOverlay
 import com.example.mygameshelf.ui.screens.Auth.components.PrimaryButton
 import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
-import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
 import com.example.mygameshelf.ui.theme.DetailCompanyRoute
 import com.example.mygameshelf.ui.theme.DetailGameRoute
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
@@ -70,6 +70,23 @@ import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+// =========================
+// PALETA GAMER HOME
+// =========================
+
+private val bgGradient = Brush.verticalGradient(
+    colors = listOf(
+        Color(0xFF020617), // fondo casi negro
+        Color(0xFF020617),
+        Color(0xFF0B1120)  // un poco más claro hacia abajo
+    )
+)
+
+private val accent = Color(0xFF6366F1)      // morado/azul gamer
+private val accentSoft = Color(0xFFA855F7)  // morado suave
+private val muted = Color(0xFF94A3B8)       // texto secundario
+private val cardBg = Color(0xFF0F172A)      // tarjetas
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -79,8 +96,6 @@ fun HomeScreen(
     gamesViewModel: GamesViewModel = viewModel(),
     authViewModel: AuthViewModel = viewModel()
 ) {
-    val colors = MaterialTheme.colorScheme
-
     // buscador principal
     var search by remember { mutableStateOf("") }
     // texto del filtro dentro del sheet
@@ -104,7 +119,7 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(bgGradient)      // FONDO GRADIENTE GAMER
     ) {
 
         LazyColumn(
@@ -127,7 +142,6 @@ fun HomeScreen(
                         }
                     },
                     onProfileClick = {
-                        // por ahora UserView está mapeado a SearchScreenRoute
                         navController.navigate(UserViewRoute) {
                             launchSingleTop = true
                             popUpTo<MainScreenRoute> { saveState = true }
@@ -137,7 +151,7 @@ fun HomeScreen(
                 )
             }
 
-            // HERO CON IMÁGENES DE JUEGOS (fondo con blackout)
+            // HERO CON IMÁGENES DE JUEGOS (fondo con blackout + brillo morado)
             item {
                 GamesHeroHeader(games = gamesState.games)
             }
@@ -146,6 +160,12 @@ fun HomeScreen(
             item {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Busca en tu estantería",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = muted
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
                     CustomOutlinedTextField(
                         modifier = Modifier.fillMaxWidth(),
                         value = search,
@@ -153,7 +173,6 @@ fun HomeScreen(
                         trailingIcon = Icons.Default.AutoAwesome,
                         placeHolder = "Busca juegos por nombre…",
                         onTrailingIconClick = {
-                            // abrimos el sheet con el texto actual
                             filterName = search
                             showSheet = true
                             scope.launch { sheetState.partialExpand() }
@@ -164,7 +183,7 @@ fun HomeScreen(
 
             // SECCIÓN GAMES
             item {
-                SectionTitle(text = "GAMES")
+                SectionTitle(text = "Tus juegos")
             }
 
             item {
@@ -172,14 +191,15 @@ fun HomeScreen(
                     gamesState.isLoading -> {
                         Text(
                             text = "Cargando juegos...",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = muted
                         )
                     }
 
                     gamesState.error != null -> {
                         Text(
                             text = gamesState.error ?: "Error al cargar juegos",
-                            color = colors.error
+                            color = Color(0xFFF97373)
                         )
                     }
 
@@ -187,7 +207,6 @@ fun HomeScreen(
                         GamesRow(
                             games = gamesState.games,
                             onGameClick = { game ->
-                                // navegación tipada
                                 navController.navigate(DetailGameRoute(game.id))
                             }
                         )
@@ -202,7 +221,7 @@ fun HomeScreen(
 
             // EMPRESAS
             item {
-                SectionTitle(text = "Empresas de videojuegos")
+                SectionTitle(text = "Estudios de videojuegos")
             }
 
             item {
@@ -210,14 +229,15 @@ fun HomeScreen(
                     companiesState.isLoading -> {
                         Text(
                             text = "Cargando compañías...",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = muted
                         )
                     }
 
                     companiesState.error != null -> {
                         Text(
                             text = companiesState.error ?: "Error al cargar compañías",
-                            color = colors.error
+                            color = Color(0xFFF97373)
                         )
                     }
 
@@ -238,7 +258,7 @@ fun HomeScreen(
             ModalBottomSheet(
                 onDismissRequest = { showSheet = false },
                 dragHandle = { BottomSheetDefaults.DragHandle() },
-                containerColor = colors.surface,
+                containerColor = cardBg,
                 sheetState = sheetState,
             ) {
                 Column(
@@ -249,12 +269,14 @@ fun HomeScreen(
                     Text(
                         text = "Filtros de búsqueda",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(4.dp))
                     Text(
                         text = "Filtra los juegos por nombre.",
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        color = muted
                     )
 
                     Spacer(Modifier.height(16.dp))
@@ -305,7 +327,7 @@ fun HomeScreen(
         // Overlay de carga global
         if (isGlobalLoading) {
             LoadingOverlay(
-                colors = colors,
+                colors = MaterialTheme.colorScheme,
                 message = "Cargando tu estantería..."
             )
         }
@@ -315,11 +337,12 @@ fun HomeScreen(
 @Composable
 private fun SectionTitle(text: String) {
     Text(
-        text = text,
+        text = text.uppercase(),
         style = MaterialTheme
             .typography
             .titleMedium
             .copy(fontWeight = FontWeight.SemiBold),
+        color = accent,
         modifier = Modifier.padding(top = 4.dp, bottom = 6.dp)
     )
 }
@@ -329,7 +352,6 @@ private fun SectionTitle(text: String) {
  */
 @Composable
 private fun GamesHeroHeader(games: List<GameDto>) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     val imageUrls = remember(games) {
@@ -350,8 +372,18 @@ private fun GamesHeroHeader(games: List<GameDto>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(180.dp),
+            .height(190.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            brush = Brush.horizontalGradient(
+                listOf(
+                    accent.copy(alpha = 0.8f),
+                    accentSoft.copy(alpha = 0.8f)
+                )
+            )
+        ),
         shape = MaterialTheme.shapes.large
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -366,26 +398,32 @@ private fun GamesHeroHeader(games: List<GameDto>) {
                     contentScale = ContentScale.Crop
                 )
             } else {
-                // fallback si aún no hay juegos
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
                             brush = Brush.linearGradient(
                                 listOf(
-                                    colors.primary.copy(alpha = 0.9f),
-                                    colors.secondary.copy(alpha = 0.9f)
+                                    accent.copy(alpha = 0.9f),
+                                    accentSoft.copy(alpha = 0.9f)
                                 )
                             )
                         )
                 )
             }
 
-            // blackout
+            // blackout + overlay morado
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.45f))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                Color.Black.copy(alpha = 0.55f),
+                                Color.Black.copy(alpha = 0.8f)
+                            )
+                        )
+                    )
             )
 
             Column(
@@ -401,9 +439,27 @@ private fun GamesHeroHeader(games: List<GameDto>) {
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Explora tu colección y sigue jugando.",
+                    text = "Explora tu colección, organiza playlists y sigue jugando.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = Color.White.copy(alpha = 0.85f)
+                )
+            }
+
+            // Etiqueta flotante
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(14.dp)
+                    .background(
+                        color = Color.Black.copy(alpha = 0.55f),
+                        shape = MaterialTheme.shapes.large
+                    )
+                    .padding(horizontal = 10.dp, vertical = 4.dp)
+            ) {
+                Text(
+                    text = "MYGAMESHELF • HOME",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = accentSoft
                 )
             }
         }
@@ -415,24 +471,28 @@ private fun GamesHeroHeader(games: List<GameDto>) {
  */
 @Composable
 private fun FeaturedShelfCard() {
-    val colors = MaterialTheme.colorScheme
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = cardBg
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        border = BorderStroke(
+            1.dp,
+            Color.White.copy(alpha = 0.05f)
         )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = Brush.linearGradient(
+                    brush = Brush.horizontalGradient(
                         listOf(
-                            colors.primary.copy(alpha = 0.9f),
-                            colors.secondary.copy(alpha = 0.9f)
+                            Color(0xFF020617),
+                            Color(0xFF020617),
+                            Color(0x330B1120)
                         )
                     )
                 )
@@ -445,14 +505,31 @@ private fun FeaturedShelfCard() {
                     text = "Tu estantería",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = colors.onPrimary
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Revisa los últimos juegos añadidos o continúa donde lo dejaste.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colors.onPrimary.copy(alpha = 0.9f)
+                    color = muted
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color.White.copy(alpha = 0.06f),
+                            shape = MaterialTheme.shapes.large
+                        )
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "TIP: Mantén tu backlog bajo control",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = accent
+                    )
+                }
             }
         }
     }
@@ -464,7 +541,6 @@ private fun CompaniesRow(
     companies: List<CompanyDto>,
     onCompanyClick: (CompanyDto) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     LazyRow(
@@ -475,10 +551,15 @@ private fun CompaniesRow(
             Card(
                 modifier = Modifier
                     .width(220.dp)
-                    .height(140.dp)
+                    .height(150.dp)
                     .clickable { onCompanyClick(company) },
                 colors = CardDefaults.cardColors(
-                    containerColor = colors.surfaceVariant
+                    containerColor = cardBg
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                border = BorderStroke(
+                    1.dp,
+                    Color.White.copy(alpha = 0.06f)
                 )
             ) {
                 Column(
@@ -490,7 +571,7 @@ private fun CompaniesRow(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(72.dp)
+                            .height(80.dp)
                             .clip(MaterialTheme.shapes.medium)
                     ) {
                         AsyncImage(
@@ -504,16 +585,19 @@ private fun CompaniesRow(
                         )
                     }
 
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(6.dp))
 
                     Text(
                         text = company.nombre,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        maxLines = 1
                     )
                     Text(
                         text = "Fundada: ${company.fundacion}",
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodySmall,
+                        color = muted
                     )
                 }
             }
@@ -527,7 +611,6 @@ private fun GamesRow(
     games: List<GameDto>,
     onGameClick: (GameDto) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     LazyRow(
@@ -537,11 +620,16 @@ private fun GamesRow(
         items(games) { game ->
             Card(
                 modifier = Modifier
-                    .width(120.dp)
-                    .height(110.dp)
+                    .width(130.dp)
+                    .height(130.dp)
                     .clickable { onGameClick(game) },
                 colors = CardDefaults.cardColors(
-                    containerColor = colors.surfaceVariant
+                    containerColor = cardBg
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                border = BorderStroke(
+                    1.dp,
+                    Color.White.copy(alpha = 0.06f)
                 )
             ) {
                 Column(
@@ -553,7 +641,7 @@ private fun GamesRow(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(55.dp)
+                            .height(70.dp)
                             .clip(MaterialTheme.shapes.medium)
                     ) {
                         AsyncImage(
@@ -572,12 +660,13 @@ private fun GamesRow(
                     Text(
                         text = game.nombre,
                         style = MaterialTheme.typography.bodySmall,
+                        color = Color.White,
                         maxLines = 1
                     )
                     Text(
                         text = "⭐ ${game.rating}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = colors.primary
+                        color = accent
                     )
                 }
             }
