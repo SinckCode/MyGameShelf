@@ -9,13 +9,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +39,7 @@ import com.example.mygameshelf.ui.theme.ListDetailRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListView(
     navController: NavController,
@@ -62,9 +67,6 @@ fun ListView(
     val cardBg = Color(0xFF0F172A)      // tarjetas
 
     val userName = remember { authViewModel.getUserName() }
-
-
-
     val initial = userName.firstOrNull()?.uppercase() ?: "?"
 
     Box(
@@ -129,9 +131,7 @@ fun ListView(
                     )
                 }
 
-
-
-                // Botón para crear lista (misma lógica de antes)
+                // Botón para crear lista
                 IconButton(
                     onClick = { navController.navigate(CreateListRoute) }
                 ) {
@@ -182,65 +182,124 @@ fun ListView(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.playlists) { playlist ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        navController.currentBackStackEntry
-                                            ?.savedStateHandle
-                                            ?.apply {
-                                                set("selectedPlaylistId", playlist.id)
-                                                set("selectedPlaylistName", playlist.name)
-                                            }
-                                        navController.navigate(ListDetailRoute)
-                                    },
-                                shape = RoundedCornerShape(18.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = cardBg
-                                ),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = 3.dp
-                                )
-                            ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 12.dp, vertical = 10.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    // Mini “portada” de la lista
-                                    Box(
-                                        modifier = Modifier
-                                            .size(46.dp)
-                                            .background(
-                                                brush = Brush.linearGradient(
-                                                    listOf(accent, accentSoft)
-                                                ),
-                                                shape = RoundedCornerShape(14.dp)
-                                            )
-                                    )
+                        items(
+                            items = uiState.playlists,
+                            key = { it.id }
+                        ) { playlist ->
 
-                                    Spacer(modifier = Modifier.width(12.dp))
-
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = playlist.name,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                            color = Color.White,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Text(
-                                            text = "Juegos: ${playlist.gamesCount}",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = accent
-                                        )
+                            val dismissState = rememberSwipeToDismissBoxState(
+                                confirmValueChange = { value ->
+                                    when (value) {
+                                        SwipeToDismissBoxValue.StartToEnd,
+                                        SwipeToDismissBoxValue.EndToStart -> {
+                                            viewModel.deletePlaylist(playlistId = playlist.id)
+                                            true
+                                        }
+                                        else -> false
                                     }
                                 }
-                            }
+                            )
+
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                enableDismissFromStartToEnd = true,
+                                enableDismissFromEndToStart = true,
+                                backgroundContent = {
+                                    // Solo mostramos rojo cuando se está deslizando
+                                    val bgColor =
+                                        if (dismissState.targetValue == SwipeToDismissBoxValue.Settled) {
+                                            Color.Transparent
+                                        } else {
+                                            Color(0xFFDC2626) // rojo intenso
+                                        }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(bgColor)
+                                            .padding(horizontal = 24.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (bgColor != Color.Transparent) {
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Outlined.Delete,
+                                                    contentDescription = "Eliminar lista",
+                                                    tint = Color.White
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = "Eliminar",
+                                                    color = Color.White,
+                                                    style = MaterialTheme.typography.bodyMedium
+                                                )
+                                            }
+                                        }
+                                    }
+                                },
+                                content = {
+                                    Card(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                navController.currentBackStackEntry
+                                                    ?.savedStateHandle
+                                                    ?.apply {
+                                                        set("selectedPlaylistId", playlist.id)
+                                                        set("selectedPlaylistName", playlist.name)
+                                                    }
+                                                navController.navigate(ListDetailRoute)
+                                            },
+                                        shape = RoundedCornerShape(18.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = cardBg
+                                        ),
+                                        elevation = CardDefaults.cardElevation(
+                                            defaultElevation = 3.dp
+                                        )
+                                    ) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            // Mini “portada” de la lista
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(46.dp)
+                                                    .background(
+                                                        brush = Brush.linearGradient(
+                                                            listOf(accent, accentSoft)
+                                                        ),
+                                                        shape = RoundedCornerShape(14.dp)
+                                                    )
+                                            )
+
+                                            Spacer(modifier = Modifier.width(12.dp))
+
+                                            Column(
+                                                modifier = Modifier.weight(1f)
+                                            ) {
+                                                Text(
+                                                    text = playlist.name,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    color = Color.White,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                                Text(
+                                                    text = "Juegos: ${playlist.gamesCount}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = accent
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            )
                         }
                     }
                 }

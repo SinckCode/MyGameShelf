@@ -161,14 +161,38 @@ class PlaylistsViewModel(
 
     // ------- ELIMINAR PLAYLIST -------
 
-    fun deletePlaylist(playlistId: String, onSuccess: () -> Unit) {
+    fun deletePlaylist(
+        playlistId: String,
+        onSuccess: (() -> Unit)? = null
+    ) {
         viewModelScope.launch {
+            // opcional: mostrar loading mientras elimina
+            _playlistsState.value = _playlistsState.value.copy(
+                isLoading = true,
+                error = null
+            )
+
             try {
+                // 1) eliminar en backend
                 playlistService.deletePlaylist(playlistId, userId)
-                loadPlaylists()
-                onSuccess()
-            } catch (_: Exception) {
-                // igual, podrías setear error en _playlistsState si lo necesitas
+
+                // 2) recargar listas
+                val data = playlistService.getMyPlaylists(userId)
+
+                // 3) actualizar estado
+                _playlistsState.value = _playlistsState.value.copy(
+                    isLoading = false,
+                    error = null,
+                    playlists = data
+                )
+
+                // 4) callback si te interesa hacer algo extra (snackbar, etc.)
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                _playlistsState.value = _playlistsState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Error al eliminar playlist"
+                )
             }
         }
     }
