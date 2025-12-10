@@ -61,7 +61,7 @@ fun AddList(
             .fillMaxSize()
             .background(Color(0xFF020617))
             .padding(contentPadding)
-            .padding(top = 10.dp)
+            .padding(top = 11.dp)
     ) {
 
         Column(
