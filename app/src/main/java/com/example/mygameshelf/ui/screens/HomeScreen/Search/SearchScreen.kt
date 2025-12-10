@@ -1,5 +1,6 @@
 package com.example.mygameshelf.ui.screens.HomeScreen.Search
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +35,23 @@ import com.example.mygameshelf.ui.theme.DetailGameRoute
 import com.example.mygameshelf.ui.viewmodels.CompaniesViewModel
 import com.example.mygameshelf.ui.viewmodels.GamesViewModel
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.ui.draw.clip
+
+// =========================
+// PALETA GAMER SEARCH
+// =========================
+
+private val bgGradient = Brush.verticalGradient(
+    colors = listOf(
+        Color(0xFF020617), // fondo casi negro
+        Color(0xFF020617),
+        Color(0xFF0B1120)  // un poco más claro hacia abajo
+    )
+)
+
+private val accent = Color(0xFF6366F1)      // morado/azul gamer
+private val accentSoft = Color(0xFFA855F7)  // morado suave
+private val muted = Color(0xFF94A3B8)       // texto secundario
+private val cardBg = Color(0xFF0F172A)      // tarjetas
 
 @Composable
 fun SearchScreen(
@@ -41,8 +60,6 @@ fun SearchScreen(
     gamesViewModel: GamesViewModel = viewModel(),
     companiesViewModel: CompaniesViewModel = viewModel()
 ) {
-    val colors = MaterialTheme.colorScheme
-
     var query by remember { mutableStateOf("") }
 
     val gamesState by gamesViewModel.uiState.collectAsState()
@@ -85,7 +102,7 @@ fun SearchScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(bgGradient)   // FONDO GRADIENTE
     ) {
         LazyColumn(
             modifier = Modifier
@@ -97,17 +114,20 @@ fun SearchScreen(
 
             // Título
             item {
-                Text(
-                    text = "Buscar",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = "Busca juegos o compañías por nombre.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.onBackground.copy(alpha = 0.7f)
-                )
+                Column {
+                    Text(
+                        text = "Buscar",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = "Explora tu estantería de juegos y estudios.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = muted
+                    )
+                }
             }
 
             // Caja de búsqueda
@@ -132,7 +152,7 @@ fun SearchScreen(
                     gamesState.error != null -> {
                         Text(
                             text = gamesState.error ?: "Error al cargar juegos",
-                            color = colors.error
+                            color = Color(0xFFF97373)
                         )
                     }
 
@@ -142,7 +162,8 @@ fun SearchScreen(
                                 "Todavía no hay juegos cargados."
                             else
                                 "No se encontraron juegos para \"$query\".",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = muted
                         )
                     }
 
@@ -167,7 +188,7 @@ fun SearchScreen(
                     companiesState.error != null -> {
                         Text(
                             text = companiesState.error ?: "Error al cargar compañías",
-                            color = colors.error
+                            color = Color(0xFFF97373)
                         )
                     }
 
@@ -177,7 +198,8 @@ fun SearchScreen(
                                 "Todavía no hay compañías cargadas."
                             else
                                 "No se encontraron compañías para \"$query\".",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = muted
                         )
                     }
 
@@ -196,7 +218,7 @@ fun SearchScreen(
         // Overlay global de carga
         if (isGlobalLoading) {
             LoadingOverlay(
-                colors = colors,
+                colors = MaterialTheme.colorScheme,
                 message = "Buscando en tu estantería..."
             )
         }
@@ -208,11 +230,12 @@ fun SearchScreen(
 @Composable
 private fun SectionTitle(text: String) {
     Text(
-        text = text,
+        text = text.uppercase(),
         style = MaterialTheme
             .typography
             .titleMedium
             .copy(fontWeight = FontWeight.SemiBold),
+        color = accent,
         modifier = Modifier.padding(top = 8.dp, bottom = 6.dp)
     )
 }
@@ -222,7 +245,6 @@ private fun GamesResultsList(
     games: List<GameDto>,
     onGameClick: (GameDto) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     Column(
@@ -234,7 +256,12 @@ private fun GamesResultsList(
                     .fillMaxWidth()
                     .clickable { onGameClick(game) },
                 colors = CardDefaults.cardColors(
-                    containerColor = colors.surfaceVariant
+                    containerColor = cardBg
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                border = BorderStroke(
+                    1.dp,
+                    Color.White.copy(alpha = 0.06f)
                 )
             ) {
                 Row(
@@ -262,12 +289,13 @@ private fun GamesResultsList(
                         Text(
                             text = game.nombre,
                             style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1
+                            maxLines = 1,
+                            color = Color.White
                         )
                         Text(
                             text = "⭐ ${game.rating}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = colors.primary
+                            color = accent
                         )
                     }
                 }
@@ -281,7 +309,6 @@ private fun CompaniesResultsList(
     companies: List<CompanyDto>,
     onCompanyClick: (CompanyDto) -> Unit
 ) {
-    val colors = MaterialTheme.colorScheme
     val context = LocalContext.current
 
     Column(
@@ -293,7 +320,12 @@ private fun CompaniesResultsList(
                     .fillMaxWidth()
                     .clickable { onCompanyClick(company) },
                 colors = CardDefaults.cardColors(
-                    containerColor = colors.surfaceVariant
+                    containerColor = cardBg
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                border = BorderStroke(
+                    1.dp,
+                    Color.White.copy(alpha = 0.06f)
                 )
             ) {
                 Row(
@@ -321,12 +353,13 @@ private fun CompaniesResultsList(
                         Text(
                             text = company.nombre,
                             style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1
+                            maxLines = 1,
+                            color = Color.White
                         )
                         Text(
                             text = "Fundada: ${company.fundacion}",
                             style = MaterialTheme.typography.bodySmall,
-                            color = colors.onSurfaceVariant
+                            color = muted
                         )
                     }
                 }
