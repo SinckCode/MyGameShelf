@@ -10,5 +10,5 @@ fun UserView(
     navController: NavController,
     contentPadding: PaddingValues
 ) {
-    Text("Algunos cambios se")
+    Text("Algunos cambios sea")
 }
