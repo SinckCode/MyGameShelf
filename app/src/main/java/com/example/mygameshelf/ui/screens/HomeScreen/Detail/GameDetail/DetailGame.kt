@@ -123,7 +123,7 @@ fun DetailGame(
                     fontSize = 28.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(bottom = 6.dp)
+                    modifier = Modifier.padding(bottom = 5.dp)
                 )
 
                 Box(
