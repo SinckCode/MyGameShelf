@@ -11,12 +11,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
-import androidx.navigation.NavType
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.mygameshelf.ui.screens.Auth.LoginScreen
@@ -44,10 +43,11 @@ class MainActivity : ComponentActivity() {
                 val backStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = backStackEntry?.destination
 
+                // 👇 Bottom bar visible en TODO el grafo principal
                 val showBottomBar =
-                    currentDestination.isRoute<MainScreenRoute>() ||
-                            currentDestination.isRoute<ListViewRoute>()   ||
-                            currentDestination.isRoute<SearchScreenRoute>()
+                    currentDestination
+                        ?.hierarchy
+                        ?.any { it.route == MainScreenGraph::class.qualifiedName } == true
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            // LISTAS (tab central)
+                            // LISTAS
                             composable<ListViewRoute> {
                                 ListView(
                                     navController = navController,
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            // SEARCH (tab derecha – lupa)
+                            // SEARCH
                             composable<SearchScreenRoute> {
                                 SearchScreen(
                                     navController = navController,
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
 
-                            // USER VIEW (perfil, no tiene tab propia)
+                            // USER VIEW
                             composable<UserViewRoute> {
                                 UserView(
                                     navController = navController,
@@ -133,13 +133,15 @@ class MainActivity : ComponentActivity() {
                                     contentPadding = innerPadding
                                 )
                             }
+
                             // ---------- DETALLE DE GAME / COMPANY ----------
                             composable<DetailGameRoute> { backStackEntry ->
                                 val args: DetailGameRoute = backStackEntry.toRoute()
 
                                 DetailGame(
                                     gameId = args.gameId,
-                                    navController = navController
+                                    navController = navController,
+                                    contentPadding = innerPadding
                                 )
                             }
 
@@ -148,10 +150,10 @@ class MainActivity : ComponentActivity() {
 
                                 DetailCompany(
                                     companyId = args.companyId,
-                                    navController = navController
+                                    navController = navController,
+                                    contentPadding = innerPadding
                                 )
                             }
-
                         }
                     }
                 }
@@ -160,10 +162,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Helper
+// Helper, por si lo necesitas en otros lados
 private inline fun <reified T> NavDestination?.isRoute(): Boolean =
     this?.route == T::class.qualifiedName
-
 
 @Composable
 fun Greeting(name: String) =

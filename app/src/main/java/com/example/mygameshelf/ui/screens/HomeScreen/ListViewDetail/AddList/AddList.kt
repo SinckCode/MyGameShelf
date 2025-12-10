@@ -71,7 +71,8 @@ fun AddList(
             Text(
                 text = playlistName?.let { "Agregar juegos a: $it" }
                     ?: "Agregar juegos a la lista",
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White
             )
             Row(
                 modifier = Modifier

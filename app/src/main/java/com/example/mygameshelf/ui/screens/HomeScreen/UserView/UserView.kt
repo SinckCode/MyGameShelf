@@ -21,6 +21,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,22 +34,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.mygameshelf.ui.theme.CreateListRoute
+import com.example.mygameshelf.ui.theme.ListViewRoute
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
+import com.example.mygameshelf.ui.viewmodels.PlaylistsViewModel
 
 @Composable
 fun UserView(
     navController: NavController,
     contentPadding: PaddingValues,
-    authViewModel: AuthViewModel = viewModel()
+    authViewModel: AuthViewModel = viewModel(),
+    playlistsViewModel: PlaylistsViewModel = viewModel()
 ) {
-    // Colores que me pasaste
+    // -------- Colores del diseño --------
     val bgGradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF020617), // casi negro
             Color(0xFF020617),
-            Color(0xFF0B1120)  // un poco más claro
+            Color(0xFF020617),
+            Color(0xFF0B1120)
         )
     )
 
@@ -55,8 +62,18 @@ fun UserView(
     val muted = Color(0xFF94A3B8)       // texto secundario
     val cardBg = Color(0xFF0F172A)      // tarjetas
 
+    // -------- Datos del usuario / playlists --------
     val userName = remember { authViewModel.getUserName() }
     val initial = userName.firstOrNull()?.uppercase() ?: "?"
+
+    // Cargar playlists cuando se abre esta vista
+    LaunchedEffect(Unit) {
+        playlistsViewModel.loadPlaylists()
+    }
+
+    // Estado de playlists (del ViewModel)
+    val playlistsState by playlistsViewModel.playlistsState.collectAsState()
+    val playlistsCount = playlistsState.playlists.size
 
     Box(
         modifier = Modifier
@@ -69,7 +86,7 @@ fun UserView(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // HEADER SIMPLE: título + subtítulo
+            // -------- HEADER --------
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -87,7 +104,7 @@ fun UserView(
                 )
             }
 
-            // AVATAR + NOMBRE
+            // -------- AVATAR + NOMBRE --------
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -133,7 +150,7 @@ fun UserView(
                 }
             }
 
-            // CARD: Información de cuenta
+            // -------- CARD: Información de la cuenta --------
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -182,7 +199,7 @@ fun UserView(
                 }
             }
 
-            // CARD: Resumen de actividad (placeholder por ahora)
+            // -------- CARD: Resumen de actividad --------
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -206,21 +223,71 @@ fun UserView(
                     )
 
                     Text(
-                        text = "Listas creadas: próximamente",
+                        text = "Listas creadas: $playlistsCount",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = muted
+                        color = Color.White
                     )
                     Text(
                         text = "Juegos añadidos a listas: próximamente",
                         style = MaterialTheme.typography.bodyMedium,
                         color = muted
                     )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Ir a ListView
+                    Button(
+                        onClick = {
+                            navController.navigate(ListViewRoute) {
+                                launchSingleTop = true
+                                popUpTo<MainScreenRoute> { saveState = true }
+                                restoreState = true
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accentSoft
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = "Ver mis playlists",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color.White
+                        )
+                    }
+
+                    // Crear playlist
+                    Button(
+                        onClick = {
+                            navController.navigate(CreateListRoute)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = accent
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    ) {
+                        Text(
+                            text = "Crear nueva playlist",
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color.White
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // BOTÓN: Cerrar sesión
+            // -------- BOTÓN: Cerrar sesión --------
             Button(
                 onClick = {
                     authViewModel.logout()

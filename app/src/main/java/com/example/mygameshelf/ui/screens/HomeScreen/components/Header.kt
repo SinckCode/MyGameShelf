@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,9 +30,10 @@ import com.example.mygameshelf.ui.theme.MyGameShelfTheme
 fun Header(
     userName: String = "",
     onLogout: () -> Unit = {},
-    onProfileClick: () -> Unit = {}      // 👈 nuevo callback
+    onProfileClick: () -> Unit = {}
 ) {
     val colors = MaterialTheme.colorScheme
+    val muted = Color(0xFF94A3B8)
 
     val label = if (userName.isNotEmpty()) {
         "Hola, $userName 👋"
@@ -48,26 +50,29 @@ fun Header(
         Column(
             modifier = Modifier.weight(1f)
         ) {
+            // Título principal en blanco, sin fondo
             Text(
                 text = "MyGameShelf",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.ExtraBold
-                )
+                ),
+                color = Color.White
             )
+
+            // Subtítulo / saludo en gris suave
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colors.onBackground.copy(alpha = 0.8f)
+                color = muted
             )
         }
 
-        // avatar con la inicial -> navegamos a UserView al tocarlo
+        // Avatar con inicial
         Box(
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(colors.primary.copy(alpha = 0.18f))
-                .clickable { onProfileClick() },       // 👈 aquí
+                .background(Color.White.copy(alpha = 0.08f)),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -84,7 +89,7 @@ fun Header(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Logout,
                 contentDescription = "Cerrar sesión",
-                tint = colors.primary
+                tint = Color.White.copy(alpha = 0.85f)
             )
         }
     }
@@ -94,6 +99,8 @@ fun Header(
 @Composable
 fun HeaderPreview() {
     MyGameShelfTheme {
-        Header(userName = "Ángel")
+        Box(Modifier.background(Color(0xFF020617))) { // simula fondo real
+            Header(userName = "Onesto")
+        }
     }
 }

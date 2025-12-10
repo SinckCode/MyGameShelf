@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,6 +22,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.mygameshelf.ui.theme.ListViewRoute
+import com.example.mygameshelf.ui.theme.MainScreenGraph
 import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.SearchScreenRoute
 
@@ -61,29 +61,36 @@ fun MyBottomBar(
                     selected = currentDestination.isRoute<MainScreenRoute>(),
                     onClick = {
                         navController.navigate(MainScreenRoute) {
+                            // No dupliques Home si ya estás ahí
                             launchSingleTop = true
-                            popUpTo<MainScreenRoute> { saveState = true }
-                            restoreState = true
+
+                            // Rompe todo lo que esté encima de Home
+                            popUpTo(MainScreenRoute::class.qualifiedName!!) {
+                                inclusive = false
+                            }
                         }
                     }
                 )
 
-                // LISTAS (antes Favorites)
+                // LISTAS
                 BottomBarItem(
                     icon = Icons.Outlined.LibraryBooks,
                     selected = currentDestination.isRoute<ListViewRoute>(),
                     onClick = {
                         navController.navigate(ListViewRoute) {
                             launchSingleTop = true
-                            popUpTo<MainScreenRoute> { saveState = true }
-                            restoreState = true
+
+                            // Siempre nos aseguramos de “volver” a partir de Home
+                            popUpTo(MainScreenRoute::class.qualifiedName!!) {
+                                inclusive = false
+                            }
                         }
                     }
                 )
             }
         }
 
-        // Botón circular de búsqueda / perfil (a la derecha)
+        // Botón circular de búsqueda
         Surface(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -91,8 +98,9 @@ fun MyBottomBar(
                 .clickable {
                     navController.navigate(SearchScreenRoute) {
                         launchSingleTop = true
-                        popUpTo<MainScreenRoute> { saveState = true }
-                        restoreState = true
+                        popUpTo(MainScreenRoute::class.qualifiedName!!) {
+                            inclusive = false
+                        }
                     }
                 },
             shape = CircleShape,
@@ -108,7 +116,6 @@ fun MyBottomBar(
                     imageVector = Icons.Outlined.Search,
                     contentDescription = "Buscar",
                     tint = Color.White,
-
                 )
             }
         }

@@ -62,7 +62,6 @@ import com.example.mygameshelf.ui.theme.DetailGameRoute
 import com.example.mygameshelf.ui.theme.LoginScreenRoute
 import com.example.mygameshelf.ui.theme.MainScreenRoute
 import com.example.mygameshelf.ui.theme.MyGameShelfTheme
-import com.example.mygameshelf.ui.theme.SearchScreenRoute
 import com.example.mygameshelf.ui.theme.UserViewRoute
 import com.example.mygameshelf.ui.viewmodels.AuthViewModel
 import com.example.mygameshelf.ui.viewmodels.CompaniesViewModel
@@ -138,14 +137,17 @@ fun HomeScreen(
                     onLogout = {
                         authViewModel.logout()
                         navController.navigate(LoginScreenRoute) {
-                            popUpTo(MainScreenRoute) { inclusive = true }
+                            // rompemos el grafo principal y volvemos limpio al login
+                            popUpTo(MainScreenRoute::class.qualifiedName!!) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
                         }
                     },
                     onProfileClick = {
                         navController.navigate(UserViewRoute) {
+                            // solo navegamos al perfil, sin popUp raros
                             launchSingleTop = true
-                            popUpTo<MainScreenRoute> { saveState = true }
-                            restoreState = true
                         }
                     }
                 )
@@ -207,7 +209,10 @@ fun HomeScreen(
                         GamesRow(
                             games = gamesState.games,
                             onGameClick = { game ->
-                                navController.navigate(DetailGameRoute(game.id))
+                                navController.navigate(DetailGameRoute(game.id)) {
+                                    // no dupliques detail si ya estás ahí
+                                    launchSingleTop = true
+                                }
                             }
                         )
                     }
@@ -245,7 +250,9 @@ fun HomeScreen(
                         CompaniesRow(
                             companies = companiesState.companies,
                             onCompanyClick = { company ->
-                                navController.navigate(DetailCompanyRoute(company.id))
+                                navController.navigate(DetailCompanyRoute(company.id)) {
+                                    launchSingleTop = true
+                                }
                             }
                         )
                     }

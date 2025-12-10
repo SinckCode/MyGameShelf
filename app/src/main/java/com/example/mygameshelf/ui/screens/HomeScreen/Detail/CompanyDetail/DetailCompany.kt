@@ -11,11 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,164 +30,141 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
-import com.example.mygameshelf.ui.screens.HomeScreen.Detail.DetailGame
-import com.example.mygameshelf.ui.screens.HomeScreen.components.Header
-import com.example.mygameshelf.ui.screens.HomeScreen.components.MyBottomBar
 import com.example.mygameshelf.ui.viewmodels.CompaniesViewModel
+import androidx.compose.foundation.layout.PaddingValues
 
 @Composable
 fun DetailCompany(
     companyId: Int?,
     navController: NavHostController,
+    contentPadding: PaddingValues,
     companiesViewModel: CompaniesViewModel = viewModel()
 ) {
     val companiesState by companiesViewModel.uiState.collectAsState()
-
     val company = companiesState.companies.find { it.id == companyId }
 
-    Scaffold(
-        bottomBar = {
-            MyBottomBar(navController = navController)
-        }
-    ) { paddingValues ->
+    Column(
+        modifier = Modifier
+            .background(Color(0xFF020617))
+            .fillMaxSize()
+            .padding(contentPadding)      // 👈 padding del Scaffold global
+            .padding(top = 20.dp)
+    ) {
 
-        //Header
+        // Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 15.dp, vertical = 15.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "MyGameShelf",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.ExtraBold
+                ),
+                color = Color.White,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // Body
         Column(
             modifier = Modifier
-                .background(Color(0xFF020617))
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(top = 20.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 12.dp)
         ) {
 
-            Row(
+            Text(
+                text = company?.nombre ?: "Cargando...",
+                fontWeight = FontWeight.Bold,
+                fontSize = 28.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 5.dp)
+            )
+
+            Box(
                 modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .clip(RoundedCornerShape(22.dp))
                     .fillMaxWidth()
-                    .padding(horizontal = 15.dp, vertical = 15.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .height(250.dp)
+                    .background(Color(0xFFA855F7))
+                    .padding(1.dp)
             ) {
-                Text(
-                    text = "MyGameShelf",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    ),
-                    color = Color.White,
-                    modifier = Modifier
-                        .weight(1f)
-                )
+                company?.let {
+                    AsyncImage(
+                        model = it.imagenURL,
+                        contentDescription = it.nombre,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
-            // ✅ BODY
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 12.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
+                // Fundación
+                InfoBoxCompany {
+                    Text(
+                        "Fundación: ${company?.fundacion}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        modifier = Modifier.padding(15.dp)
+                    )
+                }
 
-                Text(
-                    text = company?.nombre ?: "Cargando...",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 28.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.White,
-                    modifier = Modifier.padding(bottom = 5.dp)
-                )
+                // Historia
+                InfoBoxCompany {
+                    Column {
+                        Text(
+                            "Historia:",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(15.dp)
+                        )
 
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .clip(RoundedCornerShape(22.dp))
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .background(Color(0xFFA855F7))
-                        .padding(1.dp)
-                ) {
-                    company?.let {
-                        AsyncImage(
-                            model = it.imagenURL,
-                            contentDescription = it.nombre,
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
+                        Text(
+                            text = company?.historia ?: "",
+                            fontSize = 15.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(15.dp)
                         )
                     }
                 }
+            }
+        }
+    }
+}
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 5.dp)
-                    ){
-                        Box (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(Color(0xFFA855F7))
-                                .padding(1.dp)
-                        ){
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(18.dp))
-                                    .background( Color(0xFF020617)),
-                                contentAlignment = Alignment.CenterStart
-                            ){
-                                Text("Fundacion: ${company?.fundacion}",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier
-                                        .padding(15.dp)
-                                )
-                            }
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .padding(vertical = 5.dp)
-                    ){
-                        Box (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(18.dp))
-                                .background(Color(0xFFA855F7))
-                                .padding(1.dp)
-                        ){
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(18.dp))
-                                    .background( Color(0xFF020617)),
-                                contentAlignment = Alignment.CenterStart
-                            ){
-                                Column {
-                                    Text("Historia:",
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 20.sp,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .padding(15.dp)
-                                    )
-
-                                    Text(
-                                        text = company?.historia ?: "",
-                                        fontSize = 15.sp,
-                                        color = Color.White,
-                                        modifier = Modifier
-                                            .padding(15.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                }
+@Composable
+private fun InfoBoxCompany(content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(vertical = 5.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(18.dp))
+                .background(Color(0xFFA855F7))
+                .padding(1.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(Color(0xFF020617)),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                content()
             }
         }
     }
@@ -200,7 +173,9 @@ fun DetailCompany(
 @Preview(showBackground = true)
 @Composable
 fun DetailCompanyPreview() {
-    DetailCompany(5,
-        navController = rememberNavController())
+    DetailCompany(
+        5,
+        navController = rememberNavController(),
+        contentPadding = PaddingValues(0.dp)
+    )
 }
-

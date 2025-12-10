@@ -100,7 +100,8 @@ fun ListViewDetail(
                     imageVector = Icons.Filled.ChevronLeft,
                     contentDescription = "Regresar",
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    tint = Color.White
                 )
             }
             LazyColumn(
@@ -117,7 +118,8 @@ fun ListViewDetail(
                             ?: playlistUi.detail?.name
                             ?: "Lista sin nombre",
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(vertical = 10.dp)
+                        modifier = Modifier.padding(vertical = 10.dp),
+                        color = Color.White
                     )
                 }
 
@@ -240,7 +242,8 @@ fun ListViewDetail(
                     Text(
                         text = "Juegos en esta lista: ${gamesInPlaylist.size}",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = Color.White
                     )
                 }
 
